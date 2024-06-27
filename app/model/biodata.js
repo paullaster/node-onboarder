@@ -73,4 +73,4 @@ const Biodata = sequelize.define('Biodata',{
 Biodata.sync();
 
 
-export default Products;
+export default Biodata;
