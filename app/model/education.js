@@ -18,15 +18,20 @@ const Education = sequelize.define('Education',{
         unique: false
     },
     yearOfStart: {
-        type: DataTypes.DATE,
+        type: DataTypes.INTEGER,
         allowNull: false,
         unique: false,
     },
     yearOfGraduation: {
-        type: DataTypes.DATE,
+        type: DataTypes.INTEGER,
         allowNull: false,
         unique: false,
     },
+    applicantId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        unique: false,
+    }
 },
 {
     tableName: 'education',

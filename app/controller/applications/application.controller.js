@@ -5,7 +5,7 @@ import Attachment from "../../model/attachment.js";
 import Education from "../../model/education.js";
 import WorkExperience from "../../model/workexperience.js";
 import { fileTypeFromBuffer } from "file-type";
-import fs from "fs";
+import fs from  "fs";
 export class ApplicationController {
     constructor() {
         this.application = this.application.bind(this);
@@ -26,22 +26,21 @@ export class ApplicationController {
                 ...rest
             } = req.body;
             Biodata.create(rest)
-            .then( async(res) => {
-                await Address.create({applicantId: res['dataValues'].id, ...physicalAddress});
-                await Education.create({applicantId: res['dataValues'].id, ...education});
-                await ProfessionalBody.create({applicantId: res['dataValues'].id, ...professionalBodys});
-                await WorkExperience.create({applicantId: res['dataValues'].id, ...workExperience});
+            .then( async(response) => {
+                await Address.create({applicantId: response['dataValues'].id, ...physicalAddress});
+                await Education.create({applicantId: response['dataValues'].id, ...education});
+                await ProfessionalBody.create({applicantId: response['dataValues'].id, ...professionalBodys});
+                await WorkExperience.create({applicantId: response['dataValues'].id, ...workExperience});
                 for (let prop in attachments) {
                     const attachmentObj = {
                         name: prop,
                         base64: attachments[prop],
-                        id: res['dataValues'].id
+                        id: response['dataValues'].id
                     };
                     await this.processImage(attachmentObj);
                 }
+                return res.ApiResponse.success({}, 201, "Application submitted successfully");
             });
-
-            return res.ApiResponse.success(data, 201, "Application submitted successfully");
         } catch (error) {
             return res.ApiResponse.error(500, "Error while submitting application", error);
         }
@@ -50,7 +49,7 @@ export class ApplicationController {
         try {
             const attachmentBuffer = Buffer.from(attachment.base64, 'base64');
             const fileType = await fileTypeFromBuffer(attachmentBuffer);
-            const fileName = `/public/attachments/${attachment.name}-${attachment.id}.${fileType.ext}`;
+            const fileName = `public/attachments/${attachment.name}-${attachment.id}.${fileType.ext}`;
             await this.storeAttachment(attachmentBuffer, fileName, fileType.mime);
             await Attachment.create({
                 name: attachment.name,
@@ -58,17 +57,20 @@ export class ApplicationController {
                 applicantId: attachment.id,
             });
         } catch (error) {
-            throw new Error(error.message);
+            return  error;
         }
     }
     async storeAttachment(attachment, fileName, format) {
         try {
             if (format === 'application/pdf') {
-                fs.writeSync(fileName, attachment);
+                fs.writeFile(fileName, attachment, (err, data) => {
+                    if (err) throw err;
+                    console.log('File saved!');
+                });
               } else if (format === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-                fs.writeSync(fileName, attachment);
+                fs.writeFile(fileName, attachment);
               } else if (format === 'application/msword') {
-                fs.writeSync(fileName, attachment);
+                fs.writeFile(fileName, attachment);
               } else {
                 return false;
               }

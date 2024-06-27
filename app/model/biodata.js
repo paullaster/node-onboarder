@@ -18,7 +18,7 @@ const Biodata = sequelize.define('Biodata',{
         unique: false
     },
     dob: {
-        type: DataTypes.STRING,
+        type: DataTypes.DATE,
         allowNull: false,
         unique: false,
     },
