@@ -1,0 +1,26 @@
+{
+  "name": "node-onboarder",
+  "version": "1.0.0",
+  "description": "job applicant information processor ",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node  --env-file=.env.local --watch ./server.js",
+    "test": "jest"
+  },
+  "keywords": [
+    "Nodejs"
+  ],
+  "author": "paullaster",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "bcrypt": "^5.1.1",
+    "express": "^4.19.2",
+    "jimp": "^0.22.12",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.9.7",
+    "nodemailer": "^6.9.13",
+    "sequelize": "^6.37.3"
+  }
+}
