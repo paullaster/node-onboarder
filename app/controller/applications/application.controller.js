@@ -1,12 +1,12 @@
-import ProfessionalBody from "../../model/professionalbody";
-import Biodata from "../../model/biodata";
-import Address from "../../model/address";
-import Attachment from "../../model/attachment";
-import Education from "../../model/education";
-import WorkExperience from "../../model/workexperience";
+import ProfessionalBody from "../../model/professionalbody.js";
+import Biodata from "../../model/biodata.js";
+import Address from "../../model/address.js";
+import Attachment from "../../model/attachment.js";
+import Education from "../../model/education.js";
+import WorkExperience from "../../model/workexperience.js";
 import { fileTypeFromBuffer } from "file-type";
 import fs from "fs";
-class ApplicationController {
+export class ApplicationController {
     constructor() {
         this.application = this.application.bind(this);
         this.processImage = this.processImage.bind(this);
@@ -52,6 +52,11 @@ class ApplicationController {
             const fileType = await fileTypeFromBuffer(attachmentBuffer);
             const fileName = `/public/attachments/${attachment.name}-${attachment.id}.${fileType.ext}`;
             await this.storeAttachment(attachmentBuffer, fileName, fileType.mime);
+            await Attachment.create({
+                name: attachment.name,
+                url: fileName,
+                applicantId: attachment.id,
+            });
         } catch (error) {
             throw new Error(error.message);
         }
@@ -65,8 +70,9 @@ class ApplicationController {
               } else if (format === 'application/msword') {
                 fs.writeSync(fileName, attachment);
               } else {
-                console.warn('Unsupported document format');
+                return false;
               }
+
         } catch (error) {
             return false;
         }

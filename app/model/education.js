@@ -18,12 +18,12 @@ const Education = sequelize.define('Education',{
         unique: false
     },
     yearOfStart: {
-        type: DataTypes.DATETIME,
+        type: DataTypes.DATE,
         allowNull: false,
         unique: false,
     },
     yearOfGraduation: {
-        type: DataTypes.DATETIME,
+        type: DataTypes.DATE,
         allowNull: false,
         unique: false,
     },
