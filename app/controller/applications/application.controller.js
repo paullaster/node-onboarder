@@ -4,13 +4,20 @@ import Address from "../../model/address.js";
 import Attachment from "../../model/attachment.js";
 import Education from "../../model/education.js";
 import WorkExperience from "../../model/workexperience.js";
+import Contact from "../../model/contact.js";
 import { fileTypeFromBuffer } from "file-type";
 import fs from  "fs";
 export class ApplicationController {
     constructor() {
+        this.applicantId = null;
         this.application = this.application.bind(this);
-        this.processImage = this.processImage.bind(this);
+        this.processAttachments = this.processAttachments.bind(this);
         this.storeAttachment = this.storeAttachment.bind(this);
+        this.addEducation = this.addEducation.bind(this);
+        this.addProfessionalBodys = this.addProfessionalBodys.bind(this);
+        this.processWorkExperience = this.processWorkExperience.bind(this);
+        this.processContact = this.processContact.bind(this);
+        this.processAddress = this.processAddress.bind(this);
     }
     async application (req, res) {
         try {
@@ -18,6 +25,7 @@ export class ApplicationController {
                 return res.ApiResponse.error(500, "Error while submitting application",);
             }
             const {
+                contact,
                 physicalAddress,
                 education,
                 professionalBodys,
@@ -27,17 +35,19 @@ export class ApplicationController {
             } = req.body;
             Biodata.create(rest)
             .then( async(response) => {
-                await Address.create({applicantId: response['dataValues'].id, ...physicalAddress});
-                await Education.create({applicantId: response['dataValues'].id, ...education});
-                await ProfessionalBody.create({applicantId: response['dataValues'].id, ...professionalBodys});
-                await WorkExperience.create({applicantId: response['dataValues'].id, ...workExperience});
+                this.applicantId = response['dataValues'].id;
+                await this.processContact(contact);  
+                await this.processAddress(physicalAddress);
+                await this.addEducation(education);
+                professionalBodys.length && await this.addProfessionalBodys(professionalBodys);
+                response['dataValues'].currentlyEmployed && await this.processWorkExperience(workExperience);
                 for (let prop in attachments) {
                     const attachmentObj = {
                         name: prop,
                         base64: attachments[prop],
                         id: response['dataValues'].id
                     };
-                    await this.processImage(attachmentObj);
+                    await this.processAttachments(attachmentObj);
                 }
                 return res.ApiResponse.success({}, 201, "Application submitted successfully");
             });
@@ -45,7 +55,54 @@ export class ApplicationController {
             return res.ApiResponse.error(500, "Error while submitting application", error);
         }
     }
-    async processImage(attachment) {
+    async addEducation(arr) {
+        try {
+            const educationArray = arr.map((ed) => {
+                return {
+                    applicantId: this.applicantId,
+                   ...ed
+                };
+            })
+            return await Education.bulkCreate(educationArray);
+        } catch (error) {
+            return error;
+        }
+    }
+    async addProfessionalBodys(arr) {
+        try {
+            const professionalBodysArray = arr.map((prb) => {
+                return {
+                    applicantId: this.applicantId,
+                   ...prb
+                };
+            })
+            return await ProfessionalBody.bulkCreate(professionalBodysArray);
+        } catch (error) {
+            return error;
+        }
+    }
+    async processWorkExperience(workExperience) {
+        try {
+            return await WorkExperience.create({applicantId: this.applicantId,...workExperience});
+        } catch (error) {
+            return error;
+        }
+    }
+    async processContact(contact) {
+        try {
+            return await Contact.create({applicantId: this.applicantId,...contact});
+        } catch (error) {
+            return error;
+        }
+    }
+    async processAddress(address) {
+        try {
+            return await Address.create({applicantId: this.applicantId,...address});
+        } catch (error) {
+            return error;
+        }
+    }
+    async processAttachments(attachment) {
         try {
             const attachmentBuffer = Buffer.from(attachment.base64, 'base64');
             const fileType = await fileTypeFromBuffer(attachmentBuffer);

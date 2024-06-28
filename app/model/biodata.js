@@ -32,7 +32,17 @@ const Biodata = sequelize.define('Biodata',{
         allowNull: false,
         unique: false
     },
-    countyOfBirth: {
+    countyOfOrigin: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false
+    },
+    gender: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false
+    },
+    disabled: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: false
@@ -48,7 +58,23 @@ const Biodata = sequelize.define('Biodata',{
         allowNull: false,
         unique: false,
     },
+    registeredProfessionalBody: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: false,
+    },
+    registeredProfessionalRegistrationNumber: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: false,
+    },
     currentlyEmployed: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+        unique: false,
+    },
+    willingToWorkAnyWhere: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
         allowNull: false,
