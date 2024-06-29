@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "job applicant information processor ",
   "main": "server.js",
-  "type": "module",
   "scripts": {
     "start": "node  --env-file=.env.local --watch ./server.js",
-    "test": "jest"
+    "test": "jest",
+    "docker": "sudo docker build -t paullaster/node-onboarder && sudo docker run --name node-onboarder -p 80:3500 -d paullaster/node-onboarder"
   },
   "keywords": [
     "Nodejs"

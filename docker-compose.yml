@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  # MySQL database service
+  mysql:
+    image: mysql:8.3
+    container_name: node-onboarder-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3308:3306"
+    networks:
+      - node-onboarder
+
+  # Node.js application service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      image: node-onboarder-app
+      container_name: quirex-db
+      restart: unless-stopped
+    ports:
+      - "3500:3500"
+    volumes:
+      - ./:/app
+    networks:
+      - node-onboarder
+    environment:
+      from: .env.production
+      NODE_ENV: production
+    depends_on:
+      - mysql  
+
+  # Nginx reverse proxy service
+  nginx:
+    image: nginx:latest
+    container_name: node-onboarder-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./node_onboarder.conf:/etc/nginx/conf.d/node_onboarder.conf:ro
+    depends_on:
+      - app  
+    networks:
+      - node-onboarder
+
+volumes:
+  mysql_data: /var/www/mysql/data
+
+networks:
+  node-onboarder:
+    driver: bridge

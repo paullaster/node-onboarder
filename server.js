@@ -1,4 +1,4 @@
-import express from 'express';
+const express =  require('express');
 import cors from 'cors';
 import { appRputer } from './router.js';
 import { ApiResponder } from './app/middleware/api.responder.js';
