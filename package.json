@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node  --env-file=.env.local --watch ./server.js",
     "test": "jest",
-    "docker": "sudo docker build -t paullaster-node-onboarder && sudo docker run --name node-onboarder -p 80:3500 -d paullaster-node-onboarder"
+    "docker-build": "docker build -t paullaster-node-onboarder:production  . && docker run -d -p 3000:80 --rm --name paullaster-node-onboarder-app paullaster-node-onboarder:production"
   },
   "keywords": [
     "Nodejs"
