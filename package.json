@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node  --env-file=.env.local --watch ./server.js",
+    "production": "node  --env-file=.env.production ./server.js",
     "test": "jest",
     "docker-build": "docker build -t paullaster-node-onboarder:production  . && docker run -d -p 3500:80 --rm --name paullaster-node-onboarder-app paullaster-node-onboarder:production"
   },
