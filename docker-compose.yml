@@ -7,6 +7,7 @@ services:
     container_name: node-onboarder-db
     restart: unless-stopped
     environment:
+      from: .env.production
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_USER: ${DB_USERNAME}
