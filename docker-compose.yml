@@ -50,7 +50,7 @@ services:
       - node-onboarder
 
 volumes:
-  mysql_data: /var/www/mysql/data
+  mysql_data: /var/www/mysql/data:/var/lib/mysql
 
 networks:
   node-onboarder:
