@@ -17,4 +17,4 @@ COPY .env.production .env.production
 
 EXPOSE 3500
 
-CMD [ "node", "--env-file=/app/.env.production", "./server.js" ]
+CMD [ "node", "--env-file=.env.production", "./server.js" ]
