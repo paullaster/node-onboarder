@@ -9,24 +9,34 @@ services:
       - db_data:/var/lib/mysql
     networks:
       - app-network
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
 
   app:
     build: .
     ports:
-      - "3600:3500"
+      - "3500:3500"
+    env_file:
+      - .env.production
     volumes:
       - .:/usr/src/app
     networks:
       - app-network
     depends_on:
       - db
+    command: node --env-file=.env.production  ./server.js
+    environment:
+      DB_HOST: db
 
   nginx:
     build:
       context: .
       dockerfile: Dockerfile.nginx
     ports:
-      - "3700:80"
+      - "3600:80"
     networks:
       - app-network
     depends_on:
