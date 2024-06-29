@@ -23,7 +23,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      image: node-onboarder-app
       restart: unless-stopped
     ports:
       - "3500:3500"
