@@ -36,7 +36,7 @@ services:
     container_name: node-onboarder-nginx
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "3600:80"
     volumes:
       - ./node_onboarder.conf:/etc/nginx/conf.d/node_onboarder.conf:ro
     depends_on:
