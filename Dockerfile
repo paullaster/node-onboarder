@@ -13,6 +13,8 @@ RUN npm install
 
 COPY --chown=node:node . .
 
+COPY .env.production .env.production
+
 EXPOSE 3500
 
 CMD [ "node", "--env-file=/app/.env.production", "./server.js" ]
