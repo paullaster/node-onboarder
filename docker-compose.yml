@@ -24,7 +24,6 @@ services:
       context: .
       dockerfile: Dockerfile
       image: node-onboarder-app
-      container_name: quirex-db
       restart: unless-stopped
     ports:
       - "3500:3500"
