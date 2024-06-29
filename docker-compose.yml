@@ -4,10 +4,7 @@ services:
   # MySQL database service
   mysql:
     image: mysql:8.3
-    container_name: node-onboarder-db
-    restart: unless-stopped
     environment:
-      from: .env.production
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_USER: ${DB_USERNAME}
@@ -30,9 +27,6 @@ services:
       - ./:/app
     networks:
       - node-onboarder
-    environment:
-      from: .env.production
-      NODE_ENV: production
     depends_on:
       - mysql  
 
