@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize";
 import db from "../config/db.js";
 const {database, username, password, ...options} = db;
+console.log(db)
 const sequelize = new Sequelize(database, username, password, options);
 
 try {
