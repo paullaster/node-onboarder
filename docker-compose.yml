@@ -1,49 +1,40 @@
-version: "3.8"
+version: '3.8'
 
 services:
-  # MySQL database service
-  mysql:
+  db:
     image: mysql:8.3
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+    env_file:
+      - .env.production
     volumes:
-      - ./docker-compose/mysql:/docker-entrypoint-initdb.d
-    ports:
-      - "3308:3306"
+      - db_data:/var/lib/mysql
     networks:
-      - node-onboarder
+      - app-network
 
-  # Node.js application service
   app:
+    build: .
+    ports:
+      - "3600:3500"
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - app-network
+    depends_on:
+      - db
+
+  nginx:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.nginx
     ports:
-      - "3500:3500"
-    volumes:
-      - ./:/app
+      - "3700:80"
     networks:
-      - node-onboarder
+      - app-network
     depends_on:
-      - mysql  
-
-  # Nginx reverse proxy service
-  nginx:
-    image: nginx:latest
-    container_name: node-onboarder-nginx
-    restart: unless-stopped
-    ports:
-      - "3600:80"
-    volumes:
-      - ./node_onboarder.conf:/etc/nginx/conf.d/node_onboarder.conf:ro
-    depends_on:
-      - app  
-    networks:
-      - node-onboarder
+      - app
 
 networks:
-  node-onboarder:
+  app-network:
     driver: bridge
+
+volumes:
+  db_data:

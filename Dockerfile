@@ -2,8 +2,6 @@ FROM node:21.6.2-alpine
 
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 
-COPY .env.production /app/.env.production
-
 WORKDIR /home/node/app
 
 
