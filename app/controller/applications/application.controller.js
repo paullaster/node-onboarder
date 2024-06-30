@@ -5,6 +5,7 @@ import Attachment from "../../model/attachment.js";
 import Education from "../../model/education.js";
 import WorkExperience from "../../model/workexperience.js";
 import Contact from "../../model/contact.js";
+import Essay from "../../model/essay.js";
 import { fileTypeFromBuffer } from "file-type";
 import fs from  "fs";
 export class ApplicationController {
@@ -18,6 +19,7 @@ export class ApplicationController {
         this.processWorkExperience = this.processWorkExperience.bind(this);
         this.processContact = this.processContact.bind(this);
         this.processAddress = this.processAddress.bind(this);
+        this.processEssay = this.processEssay.bind(this);
     }
     async application (req, res) {
         try {
@@ -31,6 +33,7 @@ export class ApplicationController {
                 professionalBodys,
                 workExperience,
                 attachments,
+                essay,
                 ...rest
             } = req.body;
             Biodata.create(rest)
@@ -39,6 +42,7 @@ export class ApplicationController {
                 await this.processContact(contact);  
                 await this.processAddress(physicalAddress);
                 await this.addEducation(education);
+                await this.processEssay(essay);
                 professionalBodys.length && await this.addProfessionalBodys(professionalBodys);
                 response['dataValues'].currentlyEmployed && await this.processWorkExperience(workExperience);
                 for (let prop in attachments) {
@@ -98,6 +102,13 @@ export class ApplicationController {
     async processAddress(address) {
         try {
             return await Address.create({applicantId: this.applicantId,...address});
+        } catch (error) {
+            return error;
+        }
+    }
+    async processEssay(essay) {
+        try {
+            return await Essay.create({applicantId: this.applicantId,...essay});
         } catch (error) {
             return error;
         }
