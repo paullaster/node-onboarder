@@ -1,5 +1,6 @@
 import { sequelize } from "../../database/index.js";
 import { DataTypes } from "sequelize";
+import Biodata from "./biodata.js";
 
 const Contact = sequelize.define('Contact',{
     phoneNumber: {
@@ -12,11 +13,6 @@ const Contact = sequelize.define('Contact',{
         allowNull: false,
         unique: false,
     },
-    applicantId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        unique: false
-    },
 },
 {
     tableName: 'contacts',
@@ -25,6 +21,18 @@ const Contact = sequelize.define('Contact',{
     freezeTableName: true,
     charset: 'utf8mb4',
     collate: 'utf8mb4_unicode_ci'
+});
+
+Biodata.hasOne(Contact, {
+    foreignKey: 'contactId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
+
+Contact.belongsTo(Biodata, {
+    foreignKey: 'applicantId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
 });
 
 Contact.sync();

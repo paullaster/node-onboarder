@@ -1,5 +1,6 @@
 import { sequelize } from "../../database/index.js";
 import { DataTypes } from "sequelize";
+import Biodata from "./biodata.js";
 
 const Attachment = sequelize.define('Attachment',{
     name: {
@@ -8,14 +9,9 @@ const Attachment = sequelize.define('Attachment',{
         unique: false,
     },
     url: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
         unique: false,
-    },
-    applicantId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        unique: false
     },
 },
 {
@@ -25,6 +21,17 @@ const Attachment = sequelize.define('Attachment',{
     freezeTableName: true,
     charset: 'utf8mb4',
     collate: 'utf8mb4_unicode_ci'
+});
+
+Biodata.hasMany(Attachment, {
+    foreignKey: 'attachmentId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
+Attachment.belongsTo(Biodata, {
+    foreignKey: 'applicantId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
 });
 
 Attachment.sync();

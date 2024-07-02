@@ -1,5 +1,6 @@
 import { sequelize } from "../../database/index.js";
 import { DataTypes } from "sequelize";
+import Biodata from "./biodata.js";
 
 const Address = sequelize.define('Address',{
     countyOfResidence: {
@@ -31,12 +32,7 @@ const Address = sequelize.define('Address',{
         type: DataTypes.STRING,
         allowNull: false,
         unique: false
-    },
-    applicantId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        unique: false
-    },
+    }
 },
 {
     tableName: 'addresses',
@@ -45,6 +41,19 @@ const Address = sequelize.define('Address',{
     freezeTableName: true,
     charset: 'utf8mb4',
     collate: 'utf8mb4_unicode_ci'
+});
+
+Biodata.hasOne(Address, {
+    foreignKey: 'addressId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
+
+
+Address.belongsTo(Biodata, {
+    foreignKey: 'applicantId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
 });
 
 Address.sync();

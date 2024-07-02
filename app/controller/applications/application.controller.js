@@ -10,6 +10,7 @@ import { fileTypeFromBuffer } from "file-type";
 import fs from  "fs";
 export class ApplicationController {
     constructor() {
+        this.applicant = null;
         this.applicantId = null;
         this.application = this.application.bind(this);
         this.processAttachments = this.processAttachments.bind(this);
@@ -20,6 +21,7 @@ export class ApplicationController {
         this.processContact = this.processContact.bind(this);
         this.processAddress = this.processAddress.bind(this);
         this.processEssay = this.processEssay.bind(this);
+        this.persistApplicantAttachments = this.persistApplicantAttachments.bind(this);
     }
     async application (req, res) {
         try {
@@ -39,20 +41,24 @@ export class ApplicationController {
             Biodata.create(rest)
             .then( async(response) => {
                 this.applicantId = response['dataValues'].id;
+                this.applicant = response;
                 await this.processContact(contact);  
                 await this.processAddress(physicalAddress);
                 await this.addEducation(education);
                 await this.processEssay(essay);
                 professionalBodys.length && await this.addProfessionalBodys(professionalBodys);
                 response['dataValues'].currentlyEmployed && await this.processWorkExperience(workExperience);
+                const applicantAttachments = [];
                 for (let prop in attachments) {
                     const attachmentObj = {
                         name: prop,
                         base64: attachments[prop],
                         id: response['dataValues'].id
                     };
-                    await this.processAttachments(attachmentObj);
+                    const attachmentObject = await this.processAttachments(attachmentObj);
+                    applicantAttachments.push(attachmentObject);
                 }
+                await  this.persistApplicantAttachments(applicantAttachments);
                 return res.ApiResponse.success({}, 201, "Application submitted successfully");
             });
         } catch (error) {
@@ -118,12 +124,14 @@ export class ApplicationController {
             const attachmentBuffer = Buffer.from(attachment.base64, 'base64');
             const fileType = await fileTypeFromBuffer(attachmentBuffer);
             const fileName = `public/attachments/${attachment.name}-${attachment.id}.${fileType.ext}`;
-            await this.storeAttachment(attachmentBuffer, fileName, fileType.mime);
-            await Attachment.create({
+            const attachmentObj = {
                 name: attachment.name,
                 url: fileName,
                 applicantId: attachment.id,
-            });
+            }
+            await this.storeAttachment(attachmentBuffer, fileName, fileType.mime);
+            return attachmentObj;
+            
         } catch (error) {
             return  error;
         }
@@ -133,7 +141,6 @@ export class ApplicationController {
             if (format === 'application/pdf') {
                 fs.writeFile(fileName, attachment, (err, data) => {
                     if (err) throw err;
-                    console.log('File saved!');
                 });
               } else if (format === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
                 fs.writeFile(fileName, attachment);
@@ -145,6 +152,13 @@ export class ApplicationController {
 
         } catch (error) {
             return false;
+        }
+    }
+    async persistApplicantAttachments(attachments) {
+        try {
+            return await Attachment.bulkCreate(attachments);
+        } catch (error) {
+            return error;
         }
     }
 }

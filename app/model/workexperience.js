@@ -1,5 +1,6 @@
 import { sequelize } from "../../database/index.js";
 import { DataTypes } from "sequelize";
+import Biodata from "./biodata.js";
 
 const WorkExperience = sequelize.define('WorkExperience',{
     companyName: {
@@ -16,12 +17,7 @@ const WorkExperience = sequelize.define('WorkExperience',{
         type: DataTypes.TEXT,
         allowNull: false,
         unique: false
-    },
-    applicantId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        unique: false,
-    },
+    }
    
 },
 {
@@ -31,6 +27,19 @@ const WorkExperience = sequelize.define('WorkExperience',{
     freezeTableName: true,
     charset: 'utf8mb4',
     collate: 'utf8mb4_unicode_ci'
+});
+
+Biodata.hasOne(WorkExperience, {
+    foreignKey: 'workExperienceId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
+
+
+WorkExperience.belongsTo(Biodata, {
+    foreignKey: 'applicantId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
 });
 
 WorkExperience.sync();

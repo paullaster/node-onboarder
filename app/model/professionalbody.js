@@ -1,5 +1,6 @@
 import { sequelize } from "../../database/index.js";
 import { DataTypes } from "sequelize";
+import Biodata from "./biodata.js";
 
 const ProfessionalBody = sequelize.define('ProfessionalBody',{
     bodyName: {
@@ -16,11 +17,6 @@ const ProfessionalBody = sequelize.define('ProfessionalBody',{
         type: DataTypes.STRING,
         allowNull: false,
         unique: false
-    },
-    applicantId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        unique: false,
     }
 },
 {
@@ -30,6 +26,20 @@ const ProfessionalBody = sequelize.define('ProfessionalBody',{
     freezeTableName: true,
     charset: 'utf8mb4',
     collate: 'utf8mb4_unicode_ci'
+});
+
+
+Biodata.hasMany(ProfessionalBody, {
+    foreignKey: 'professionalBodyId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
+
+
+ProfessionalBody.belongsTo(Biodata, {
+    foreignKey: 'applicantId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
 });
 
 ProfessionalBody.sync();
