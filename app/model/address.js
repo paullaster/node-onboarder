@@ -44,7 +44,7 @@ const Address = sequelize.define('Address',{
 });
 
 Biodata.hasOne(Address, {
-    foreignKey: 'addressId',
+    foreignKey: 'applicantId',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });

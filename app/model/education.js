@@ -39,7 +39,7 @@ const Education = sequelize.define('Education',{
 });
 
 Biodata.hasMany(Education, {
-    foreignKey: 'educationId',
+    foreignKey: 'applicantId',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });

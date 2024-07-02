@@ -24,7 +24,7 @@ const Contact = sequelize.define('Contact',{
 });
 
 Biodata.hasOne(Contact, {
-    foreignKey: 'contactId',
+    foreignKey: 'applicantId',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });

@@ -24,7 +24,7 @@ const Attachment = sequelize.define('Attachment',{
 });
 
 Biodata.hasMany(Attachment, {
-    foreignKey: 'attachmentId',
+    foreignKey: 'applicantId',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });

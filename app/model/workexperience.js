@@ -30,7 +30,7 @@ const WorkExperience = sequelize.define('WorkExperience',{
 });
 
 Biodata.hasOne(WorkExperience, {
-    foreignKey: 'workExperienceId',
+    foreignKey: 'applicantId',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });

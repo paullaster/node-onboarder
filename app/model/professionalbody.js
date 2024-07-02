@@ -30,7 +30,7 @@ const ProfessionalBody = sequelize.define('ProfessionalBody',{
 
 
 Biodata.hasMany(ProfessionalBody, {
-    foreignKey: 'professionalBodyId',
+    foreignKey: 'applicantId',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });

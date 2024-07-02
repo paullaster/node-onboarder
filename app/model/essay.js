@@ -25,7 +25,7 @@ const Essay = sequelize.define('Essay',{
 });
 
 Biodata.hasOne(Essay, {
-    foreignKey: 'essayId',
+    foreignKey: 'applicantId',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });
