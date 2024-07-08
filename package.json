@@ -5,8 +5,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node  --env-file=.env.local --watch ./server.js",
-    "production": "node  --env-file=.env.production ./server.js",
+    "start": "node --env-file=.env.local --experimental-loader=@opentelemetry/instrumentation/hook.mjs  --import ./instrument.js --watch ./server.js",
+    "production": "node --env-file=.env.production  --experimental-loader=@opentelemetry/instrumentation/hook.mjs  --import ./instrument.js ./server.js",
     "test": "jest",
     "docker-build": "docker build -t paullaster-node-onboarder:production  . && docker run -d -p 3500:80 --rm --name paullaster-node-onboarder-app paullaster-node-onboarder:production"
   },
@@ -16,6 +16,9 @@
   "author": "paullaster",
   "license": "ISC",
   "dependencies": {
+    "@opentelemetry/instrumentation": "^0.52.1",
+    "@sentry/node": "^8.15.0",
+    "@sentry/profiling-node": "^8.15.0",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "express": "^4.19.2",
