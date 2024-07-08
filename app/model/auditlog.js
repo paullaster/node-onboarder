@@ -1,7 +1,7 @@
 import { sequelize } from "../../database/index.js";
 import { DataTypes } from "sequelize";
-import Biodata from "./biodata.js";
 import Application from './application.js'
+import User from './user.js'
 
 const AuditLog = sequelize.define('AuditLog',{
     from: {

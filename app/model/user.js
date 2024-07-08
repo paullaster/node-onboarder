@@ -18,6 +18,23 @@ const User = sequelize.define('User',{
         unique: false,
         defaultValue: 10,
     },
+    lastLogin: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        unique: false,
+        defaultValue: new Date()
+    },
+    active:{
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        unique: false,
+        defaultValue: false
+    },
+    phone:{
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: false
+    }
 },
 {
     tableName: 'users',
