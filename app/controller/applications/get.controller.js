@@ -32,7 +32,7 @@ export class ApplicationsController {
     }
     async application (req, res) {
         try {
-            Application.findOne({where: {applicationId: req.param.id},include: [{model:Biodata, include:{Address}}]})            
+            return res.ApiResponse(await Application.findOne({where: {applicationId: req.param.id},include: [{model:Biodata, include:{Address}}]}))           
         } catch (error) {
             return res.ApiResponse.error(500, error);
         }

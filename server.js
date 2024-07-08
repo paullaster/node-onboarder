@@ -4,6 +4,7 @@ import { appRouter } from './router.js';
 import { ApiResponder } from './app/middleware/api.responder.js';
 import path from "path";
 import { fileURLToPath } from "url";
+import { Admin } from './adapters/admin.js';
 
 const app = express();
 const port = process.env.PORT || 3500;
@@ -20,7 +21,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // USE ROUTER
 app.use('/onboarder/api', appRouter);
-
+app.use('/admin', Admin)
 
 
 
