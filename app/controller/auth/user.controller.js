@@ -30,8 +30,8 @@ export class UserController {
             };
             const userToken = await Token.create(data);
             const resetLink = `${app.web_url}/auth/activate/${userToken.key}`;
-            const email = new Notification();
-            email.via('viaEmail', {});
+            const newEmail = new Notification();
+            newEmail.via('viaEmail', {});
             res.ApiResponse.success({ token }, "Login successful", 200);
         } catch (error) {
             
