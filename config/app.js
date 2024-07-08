@@ -8,4 +8,9 @@ export default {
     key: process.env.APP_KEY,
     environment: process.env.APP_ENV,
     timezone: process.env.APP_TIMEZONE,
+    web_url: process.env.APP_WEB_URL,
+    api_url: process.env.APP_API_URL,
+    admin_url: process.env.APP_ADMIN_URL,
+    sentry_dsn: process.env.SENTRY_DSN,
+    sentry_release: process.env.SENTRY_RELEASE,
 };
