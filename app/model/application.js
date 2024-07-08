@@ -11,31 +11,6 @@ const Application = sequelize.define('Application',{
         values: [0, 1, 2, 3, 4],
 
     },
-    reviewedBy: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false,
-    },
-    street: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false
-    },
-    city: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false,
-    },
-    estate: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false,
-    },
-    village: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false
-    }
 },
 {
     tableName: 'applications',
@@ -46,14 +21,14 @@ const Application = sequelize.define('Application',{
     collate: 'utf8mb4_unicode_ci'
 });
 
-Biodata.hasOne(Address, {
+Biodata.hasOne(Application, {
     foreignKey: 'applicantId',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });
 
 
-Address.belongsTo(Biodata, {
+Application.belongsTo(Biodata, {
     foreignKey: 'applicantId',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',

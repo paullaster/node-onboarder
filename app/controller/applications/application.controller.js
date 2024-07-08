@@ -1,5 +1,6 @@
 import ProfessionalBody from "../../model/professionalbody.js";
 import Biodata from "../../model/biodata.js";
+import Application from "../../model/application.js";
 import Address from "../../model/address.js";
 import Attachment from "../../model/attachment.js";
 import Education from "../../model/education.js";
@@ -59,6 +60,7 @@ export class ApplicationController {
                     applicantAttachments.push(attachmentObject);
                 }
                 await  this.persistApplicantAttachments(applicantAttachments);
+                await this.persistApplication(Biodata)
                 return res.ApiResponse.success({}, 201, "Application submitted successfully");
             });
         } catch (error) {
@@ -159,6 +161,13 @@ export class ApplicationController {
             return await Attachment.bulkCreate(attachments);
         } catch (error) {
             return error;
+        }
+    }
+    async persistApplication(biodata){
+        try {
+            biodata.createApplication()
+        } catch (error) {
+            return error
         }
     }
 }
