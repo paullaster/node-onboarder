@@ -3,14 +3,27 @@ import jwt from 'jsonwebtoken';
 import app from "../../config/app.js";
 import Token from "../../model/token.js";
 import { Notification } from "../../notification/notification.js";
+import bcrypt from 'bcryptjs';
 export class UserController {
     constructor() {
         this.login = this.login.bind(this);
     }
     async login(req, res) {
+      try {
+        if(!req.body) {}
         const { email, password } = req.body;
-        // Implement your login logic here
-        res.ApiResponse.success({ message: 'Login successful' });
+        if(!email ||!password) return res.ApiResponse.error(500, "Missing email or password");
+        const user  = await User.findOne({where: {email: email}});
+        if(!user) return res.ApiResponse.error(404, "User not found");
+        const isPasswordMatch  = await bcrypt.compare(password, user.password)
+        if (isPasswordMatch !== true) {
+            return { error: "Password mismatch", success: false };
+        }
+        const token = jwt.sign({userId: user.email, email: user.email}, app.key, {algorithm: 'HS512', expiresIn: '10h' });
+          return res.ApiResponse.success(token, 200, "Login successful");
+      } catch (error) {
+        
+      }
     }
     async activateAccount(req, res) {
         try {
