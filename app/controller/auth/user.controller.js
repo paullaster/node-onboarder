@@ -1,6 +1,8 @@
 import User from "../../model/user";
 import jwt from 'jsonwebtoken';
 import app from "../../config/app.js";
+import Token from "../../model/token.js";
+import { Notification } from "../../notification/notification.js";
 export class UserController {
     constructor() {
         this.login = this.login.bind(this);
@@ -21,8 +23,15 @@ export class UserController {
             if (user.active) return res.ApiResponse.error(404, "Account activated already, Pleae proceed to login");
             const { role, email } = user;
             const token =   jwt.sign({role, email}, app.key,  {algorithm: 'HS512', expiresIn: '1h' });
-            
-            
+            const data =  {
+                key: token,
+                userId: user.id,
+                expiry: new Date(currentTime.getTime() + 3600000),
+            };
+            const userToken = await Token.create(data);
+            const resetLink = `${app.web_url}/auth/activate/${userToken.key}`;
+            const email = new Notification();
+            email.via('viaEmail', {});
             res.ApiResponse.success({ token }, "Login successful", 200);
         } catch (error) {
             
