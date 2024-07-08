@@ -4,11 +4,11 @@ import Biodata from "./biodata.js";
 
 const Application = sequelize.define('Application',{
     status: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
         unique: false,
-        defaultValue: 'New',
-        values: ['New', 'Pending', 'Denied', 'Approved'],
+        defaultValue: 0,
+        values: [0, 1, 2, 3, 4],
 
     },
     reviewedBy: {
