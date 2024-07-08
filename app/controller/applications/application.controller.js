@@ -23,6 +23,7 @@ export class ApplicationController {
         this.processAddress = this.processAddress.bind(this);
         this.processEssay = this.processEssay.bind(this);
         this.persistApplicantAttachments = this.persistApplicantAttachments.bind(this);
+        this.persistApplication = this.persistApplication.bind(this);
     }
     async application (req, res) {
         try {
@@ -60,7 +61,7 @@ export class ApplicationController {
                     applicantAttachments.push(attachmentObject);
                 }
                 await  this.persistApplicantAttachments(applicantAttachments);
-                await this.persistApplication(Biodata)
+                await this.persistApplication();
                 return res.ApiResponse.success({}, 201, "Application submitted successfully");
             });
         } catch (error) {
@@ -163,9 +164,9 @@ export class ApplicationController {
             return error;
         }
     }
-    async persistApplication(biodata){
+    async persistApplication(){
         try {
-            biodata.createApplication()
+            await Application.create({applicantId: this.applicantId})
         } catch (error) {
             return error
         }

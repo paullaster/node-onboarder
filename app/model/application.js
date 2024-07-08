@@ -25,6 +25,7 @@ Biodata.hasOne(Application, {
     foreignKey: 'applicantId',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
+    as: 'Biodata',
 });
 
 

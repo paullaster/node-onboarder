@@ -9,23 +9,10 @@ import Application from "../../model/application.js";
 import Essay from "../../model/essay.js";
 
 export class ApplicationsController {
-    constructor() {
-        this.applicant = null;
-        this.applicantId = null;
-        this.application = this.application.bind(this);
-        this.processAttachments = this.processAttachments.bind(this);
-        this.storeAttachment = this.storeAttachment.bind(this);
-        this.addEducation = this.addEducation.bind(this);
-        this.addProfessionalBodys = this.addProfessionalBodys.bind(this);
-        this.processWorkExperience = this.processWorkExperience.bind(this);
-        this.processContact = this.processContact.bind(this);
-        this.processAddress = this.processAddress.bind(this);
-        this.processEssay = this.processEssay.bind(this);
-        this.persistApplicantAttachments = this.persistApplicantAttachments.bind(this);
-    }
     async applications (req, res) {
         try {
-            Application.findAll({include: [{model:Biodata, include:{Address}}]})            
+            const applications = await Application.findAll( {include: [{model:Biodata, include:[ProfessionalBody, Address, Education, WorkExperience, Contact, Essay, Attachment]}]});
+            return res.ApiResponse.success(applications);   
         } catch (error) {
             return res.ApiResponse.error(500, error);
         }
