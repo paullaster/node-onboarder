@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { appRputer } from './router.js';
+import { appRouter } from './router.js';
 import { ApiResponder } from './app/middleware/api.responder.js';
 import path from "path";
 import { fileURLToPath } from "url";
@@ -19,7 +19,7 @@ const __dirname = path.dirname(_filename);
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // USE ROUTER
-app.use('/onboarder/api', appRputer);
+app.use('/onboarder/api', appRouter);
 
 
 

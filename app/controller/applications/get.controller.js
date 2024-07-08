@@ -8,7 +8,7 @@ import Contact from "../../model/contact.js";
 import Application from "../../model/application.js";
 import Essay from "../../model/essay.js";
 
-export class ApplicationController {
+export class ApplicationsController {
     constructor() {
         this.applicant = null;
         this.applicantId = null;

@@ -1,9 +1,12 @@
 import express from 'express';
 import { ApplicationController } from './app/controller/applications/application.controller.js';
+import { ApplicationsController } from './app/controller/applications/get.controller.js';
 
-const appRputer = express.Router();
+const appRouter = express.Router();
 
 // ROUTES
-appRputer.post('/application', new ApplicationController().application);
+appRouter.post('/application', new ApplicationController().application);
+appRouter.get('/applications', new ApplicationsController().applications);
+appRouter.get('/application', new ApplicationsController().application);
 
-export { appRputer };
+export { appRouter };
