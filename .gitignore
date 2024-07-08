@@ -1,3 +1,4 @@
 *.local
 node_modules
 /public/attachments/
+*.env
