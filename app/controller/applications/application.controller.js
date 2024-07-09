@@ -9,6 +9,8 @@ import Contact from "../../model/contact.js";
 import Essay from "../../model/essay.js";
 import { fileTypeFromBuffer } from "file-type";
 import fs from  "fs";
+import NTLMSERVICE from "../../services/ntlm.service.js";
+import { BCController } from "../bc/bc.controller.js";
 export class ApplicationController {
     constructor() {
         this.applicant = null;
@@ -62,6 +64,16 @@ export class ApplicationController {
                 }
                 await  this.persistApplicantAttachments(applicantAttachments);
                 await this.persistApplication();
+                const ntlmService = new NTLMSERVICE('biodata');
+                const BCINSTANCE = new BCController(ntlmService);
+                const applicant = await Biodata.findOne({where: {id: this.applicantId}, include:[ProfessionalBody, Address, Education, WorkExperience, Contact, Essay, Attachment]});
+                if (!applicant) {
+                    return res.ApiResponse.error(500, "Error while submitting application", error);
+                };
+                const {success, } = await BCINSTANCE.postapplicant(applicant);
+                if (!success) {
+                    return res.ApiResponse.error(500, "Error while submitting application to BC", error);
+                }
                 return res.ApiResponse.success({}, 201, "Application submitted successfully");
             });
         } catch (error) {

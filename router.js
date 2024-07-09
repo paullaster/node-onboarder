@@ -7,6 +7,6 @@ const appRouter = express.Router();
 // ROUTES
 appRouter.post('/application', new ApplicationController().application);
 appRouter.get('/applications', new ApplicationsController().applications);
-appRouter.get('/application', new ApplicationsController().application);
+appRouter.get('/application/:id', new ApplicationsController().application);
 
 export { appRouter };

@@ -11,7 +11,14 @@ import Essay from "../../model/essay.js";
 export class ApplicationsController {
     async applications (req, res) {
         try {
-            const applications = await Application.findAll( {include: [{model:Biodata, include:[ProfessionalBody, Address, Education, WorkExperience, Contact, Essay, Attachment]}]});
+            const { page, limit } = req.query;
+            if (limit) {
+                req.query.limit = Number(limit);
+            }
+            if (page) {
+                req.query.offset = Number(page);
+            }
+            const applications = await Application.findAndCountAll({ limit: req.query.limit || 10, include: [{model:Biodata, include:[ProfessionalBody, Address, Education, WorkExperience, Contact, Essay, Attachment]}]});
             return res.ApiResponse.success(applications);   
         } catch (error) {
             return res.ApiResponse.error(500, error);
@@ -19,9 +26,10 @@ export class ApplicationsController {
     }
     async application (req, res) {
         try {
-            return res.ApiResponse(await Application.findOne({where: {applicationId: req.param.id},include: [{model:Biodata, include:{Address}}]}))           
+            if (!req.params.id) return res.ApiResponse.error(500, "Invalid application id");
+            return res.ApiResponse.success(await Application.findOne({where: {id: req.params.id}, include: [{model:Biodata, include:[ProfessionalBody, Address, Education, WorkExperience, Contact, Essay, Attachment]}]}))           
         } catch (error) {
-            return res.ApiResponse.error(500, error);
+            return res.ApiResponse.error(500, error.message);
         }
     }    
 }
