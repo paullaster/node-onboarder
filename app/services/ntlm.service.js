@@ -34,13 +34,13 @@ class NTLMSERVICE {
             }
             catch (err) {
                 if (Object.keys(payload).length) {
-                    console.log("FAILED BODY", payload);
+                    console.log("FAILED BC BODY", payload);
                 }
                 return {success: false, error: err.message}
             }
         } catch (error) {
             if (Object.keys(payload).length) {
-                console.log("FAILED BODY", payload);
+                console.log("FAILED BC BODY", payload);
             }
             return { success: false, error: error.message }
         }
