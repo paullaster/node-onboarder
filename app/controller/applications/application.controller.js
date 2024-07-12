@@ -93,6 +93,7 @@ export class ApplicationController {
                     return res.ApiResponse.success({}, 201, "Application submitted successfully");
                 })
                 .catch((error) => {
+                    console.log("BIODATA VALIDATION", error);
                     return res.ApiResponse.error(500, "Error while submitting application " + error.message);
                 });
         } catch (error) {
