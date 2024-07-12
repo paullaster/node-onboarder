@@ -44,6 +44,7 @@ export class ApplicationController {
                 essay,
                 ...rest
             } = req.body;
+            console.log("BIODATA PAYLOAD", rest);
             Biodata.create(rest)
                 .then(async (response) => {
                     this.applicantId = response['dataValues'].id;
