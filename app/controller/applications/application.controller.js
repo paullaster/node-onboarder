@@ -45,11 +45,8 @@ export class ApplicationController {
                 ...rest
             } = req.body;
             let dob = new Date(rest.dob);
-            const yr = dob.getFullYear();
-            const month = dob.getMonth() + 1;
-            const date = dob.getDate();
-            res.dob = `${yr}-${month > 9 ? month : '0' + month}-${date > 9 ? date : '0' + date}`;
-            console.log("DOB", dob, rest.dob);
+            rest.dob = dob.toISOString().split('T')[0]
+            console.log("DOB ", rest.dob);
             Biodata.create(rest)
                 .then(async (response) => {
                     this.applicantId = response['dataValues'].id;
