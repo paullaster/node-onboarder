@@ -33,9 +33,15 @@ class NTLMSERVICE {
                 return {success: true, data: resp.data}
             }
             catch (err) {
+                if (Object.keys(payload).length) {
+                    console.log("FAILED BODY", payload);
+                }
                 return {success: false, error: err.message}
             }
         } catch (error) {
+            if (Object.keys(payload).length) {
+                console.log("FAILED BODY", payload);
+            }
             return { success: false, error: error.message }
         }
     }

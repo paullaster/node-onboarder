@@ -46,7 +46,6 @@ export class ApplicationController {
             } = req.body;
             let dob = new Date(rest.dob);
             rest.dob = dob.toISOString().split('T')[0]
-            console.log("DOB ", rest.dob);
             Biodata.create(rest)
                 .then(async (response) => {
                     this.applicantId = response['dataValues'].id;
@@ -96,6 +95,7 @@ export class ApplicationController {
                     return res.ApiResponse.success({}, 201, "Application submitted successfully");
                 })
                 .catch((error) => {
+                    console.log("FAILED BODY", rest);
                     console.log("BIODATA VALIDATION", error);
                     return res.ApiResponse.error(500, "Error while submitting application " + error.message);
                 });
