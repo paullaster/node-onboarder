@@ -10,6 +10,7 @@ import { fileTypeFromBuffer } from "file-type";
 import fs from "fs";
 import app from "../../../config/app.js";
 import eventEmmitter from "../../events/emmitter/event.emitter.js";
+import { makeid } from "../../../util/random.string.js";
 export class ApplicationController {
     constructor() {
         this.applicant = null;
@@ -149,7 +150,7 @@ export class ApplicationController {
         try {
             const attachmentBuffer = Buffer.from(attachment.base64, 'base64');
             const fileType = await fileTypeFromBuffer(attachmentBuffer);
-            const fileName = `public/attachments/${attachment.name}-${attachment.id}.${fileType.ext}`;
+            const fileName = `public/attachments/${attachment.name}-${attachment.id}-${makeid(5)}.${fileType.ext}`;
             const attachmentObj = {
                 name: attachment.name,
                 url: fileName,
