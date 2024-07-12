@@ -25,6 +25,7 @@ class NTLMSERVICE {
                 },
             };
             if (Object.keys(payload).length) {
+                console.log("BC PAYLOAD",payload);
                 requestOptions.data = payload;
             }
             let client = NtlmClient(this.credentials)
