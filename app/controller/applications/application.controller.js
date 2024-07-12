@@ -44,7 +44,12 @@ export class ApplicationController {
                 essay,
                 ...rest
             } = req.body;
-            console.log("BIODATA PAYLOAD", rest);
+            let dob = new Date(rest.dob);
+            const yr = dob.getFullYear();
+            const month = dob.getMonth() + 1;
+            const date = dob.getDate();
+            res.dob = `${yr}-${month > 9 ? month : '0' + month}-${date > 9 ? date : '0' + date}`;
+            console.log("DOB", rest.dob);
             Biodata.create(rest)
                 .then(async (response) => {
                     this.applicantId = response['dataValues'].id;
@@ -89,7 +94,7 @@ export class ApplicationController {
                         professionalBody: professionalBodys,
                         applicationAttachments: applicantAttachments.map(attachment => ({ name: attachment.name, link: `${app.url}/${attachment.url}` })),
                     };
-                    eventEmmitter.emit('BCInsert', {payload, applicantId: this.applicantId});
+                    eventEmmitter.emit('BCInsert', { payload, applicantId: this.applicantId });
                     eventEmmitter.emit("applicationSubmitted", this.applicant);
                     return res.ApiResponse.success({}, 201, "Application submitted successfully");
                 })
