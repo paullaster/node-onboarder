@@ -2,19 +2,28 @@ export class BCController {
     constructor(traport) {
         this.traport = traport;
         this.postapplicant = this.postapplicant.bind(this);
+        this.getSetups = this.getSetups.bind(this);
     }
 
     async postapplicant(applicant) {
         try {
-            console.log("Called BC Controller", this.traport)
-            return {success: true, data: this.traport.request(applicant, 'POST')};
+            const { success, data, error } = await this.traport.request(applicant, 'POST');
+            if (success) {
+                return { success, data };
+            }
+            return {success, error };
         } catch (error) {
-            return {vsuccess: false, error: error.message}
+            return {success: false, error: error.message}
         }
     }
 
-    async getWorkExperience() {
-        return await this.bc.getWorkExperience();
+    async getSetups(req, res) {
+        try {
+            const data = await this.traport.request();
+            return res.ApiResponse.success(data, 200, );
+        } catch (error) {
+            return res.ApiResponse.error(error.message);
+        }
     }
 
     async getEducation() {

@@ -1,53 +1,42 @@
 
 import bc from "../../config/bc.js";
-import httpntlm from "httpntlm";
-const { company, ...options } = bc;
+import { NtlmClient } from "axios-ntlm";
+const { company, username, password, domain, url } = bc;
 
 class NTLMSERVICE {
     constructor(entity) {
         this.entity = entity;
-        for (let prop in options) {
-            this[prop] = options[prop];
+        this.credentials = {
+            username: username,
+            password: password,
+            domain: domain
         }
+        this.url = `${url}/${this.entity}`;
         this.request = this.request.bind(this);
     }
-    async request(payload, method = 'GET') {
+    async request(payload = {}, method = 'GET') {
         try {
-            const body = JSON.stringify(payload);
-            console.log("body", body);
-            const requestMethod = toUpperCase(method);
+            const requestMethod = method.toUpperCase();
             const requestOptions = {
-                url: `${this.url}/${this.entity}`,
-                username: this.username,
-                password: this.password,
-                domain: this.domain,
-                workstation: this.workstation,
+                url: this.url,
+                method: requestMethod,
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: body,
             };
-            console.log("options",requestOptions);
-            switch (requestMethod) {
-                case 'GET':
-                    return {success: true, data: await httpntlm.get(requestOptions)};
-                case 'POST':
-                    return await httpntlm.post(requestOptions);
-                case 'PUT':
-                    return {success:true, data: await httpntlm.put({...requestOptions, headers: {
-                        'If-Match': '*',
-                        ...headers,
-                    },})};
-                case 'DELETE':
-                    return {success: true, data: await httpntlm.del({...requestOptions, headers: {
-                        'If-Match': '*',
-                        ...headers,
-                    },})};
-                default:
-                    return {success: false, error: "Invalid method"};
+            if (Object.keys(payload).length) {
+                requestOptions.data = payload;
+            }
+            let client = NtlmClient(this.credentials)
+            try {
+                let resp = await client(requestOptions);
+                return {success: true, data: resp.data}
+            }
+            catch (err) {
+                return {success: false, error: err.message}
             }
         } catch (error) {
-            return { success: false, error: error.message}
+            return { success: false, error: error.message }
         }
     }
 }

@@ -25,12 +25,12 @@ const Biodata = sequelize.define('Biodata',{
     idNumber: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: false
+        unique: true
     },
     pinNumber: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: false
+        unique: true
     },
     countyOfOrigin: {
         type: DataTypes.STRING,
@@ -85,6 +85,16 @@ const Biodata = sequelize.define('Biodata',{
         defaultValue: false,
         allowNull: false,
         unique: false,
+    },
+    phoneNumber: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
     },
 },
 {

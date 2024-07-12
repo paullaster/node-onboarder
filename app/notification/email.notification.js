@@ -1,4 +1,5 @@
-import transporter from "../services/mail.service";
+import transporter from "../services/mail.service.js";
+import { mail } from "../../config/email.js";
 export class EmailNotification {
     async send(mailable, ...args) {
         try {
@@ -13,7 +14,7 @@ export class EmailNotification {
             transporter.close();
             return {success: true, data: info};
     } catch(error) {
-        console.error(`Error sending email: ${error.message}`);
+        return {success: false, error: error.message};
     }
 }
 }

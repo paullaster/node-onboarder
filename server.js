@@ -4,13 +4,15 @@ import { appRouter } from './router.js';
 import { ApiResponder } from './app/middleware/api.responder.js';
 import path from "path";
 import { fileURLToPath } from "url";
+import "./app/events/listeners/application.events.js";
+import "./app/events/listeners/bc.insert.js";
 
 const app = express();
 const port = process.env.PORT || 3500;
 
 // SEETINGs
 app.use(cors());
-app.use(express.json());
+app.use(express.json({limit: '4096mb'}));
 app.use(ApiResponder);
 
 // Static files middleware

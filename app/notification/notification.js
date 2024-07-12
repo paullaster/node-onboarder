@@ -1,15 +1,16 @@
 
-import { EmailNotification } from "./email.notification";
+import { EmailNotification } from "./email.notification.js";
 export class Notification {
     constructor(email, subject, body) {
         this.email = email;
         this.subject = subject;
         this.body = body;
+        this.via = this.via.bind(this);
     }
     async via(channel) {
         try {
             const mailable = {
-                email: this.notifiable,
+                email: this.email,
                 subject: this.subject,
                 html: this.body,
             }
@@ -24,5 +25,4 @@ export class Notification {
             return { success: false, error: error.message };
         }
     }
-    sendSms() {}
 }

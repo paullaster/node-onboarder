@@ -11,6 +11,18 @@ const Application = sequelize.define('Application',{
         values: [0, 1, 2, 3, 4],
 
     },
+    synced: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        unique: false,
+        defaultValue: false,
+    },
+    receivedNotified: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        unique: false,
+        defaultValue: false,
+    },
 },
 {
     tableName: 'applications',
@@ -25,7 +37,6 @@ Biodata.hasOne(Application, {
     foreignKey: 'applicantId',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
-    as: 'Biodata',
 });
 
 

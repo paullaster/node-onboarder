@@ -23,14 +23,12 @@ const Token = sequelize.define('Token',{
     collate: 'utf8mb4_unicode_ci'
 });
 
-Token.hasOne(User, {
-    foreignKey: 'userId',
+User.hasOne(Token, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 })
 
 Token.belongsTo(User, {
-    foreignKey: 'userId',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 })
