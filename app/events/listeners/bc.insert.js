@@ -7,11 +7,13 @@ import Application from "../../model/application.js";
 eventEmmitter.on("BCInsert", async(payload) => {
     const ntlmService = new NTLMSERVICE('biodata');
     const BCINSTANCE = new BCController(ntlmService);
-    const { success } = await BCINSTANCE.postapplicant(payload.payload);
+    const { success, error } = await BCINSTANCE.postapplicant(payload.payload);
     if (success) {
         const updateApplication = await Application.findOne({ where: { applicantId: payload.applicantId } });
         if (updateApplication) {
             await updateApplication.update({ synced: true });
         }
+    }else {
+        console.error(`Error in BC Insert: ${error}`);
     }
 });
