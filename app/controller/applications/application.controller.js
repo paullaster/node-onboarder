@@ -52,6 +52,7 @@ export class ApplicationController {
                 workExperience,
                 attachments,
                 essay,
+                category,
                 ...rest
             } = req.body;
             let dob = new Date(rest.dob);
@@ -204,7 +205,7 @@ export class ApplicationController {
                 const { success:org, } = await validationMiddleware.professionalBody(req.body.professionalBodys);
                 
             if (!org) {
-                return res.ApiResponse.error(400, "Error while submitting application. Invalid professional bodies record.: ");
+                req.body.professionalBodys = [];
             }
             }
             const {
@@ -214,6 +215,7 @@ export class ApplicationController {
                 workExperience,
                 attachments,
                 essay,
+                category,
                 ...rest
             } = req.body;
             let dob = new Date(rest.dob);
@@ -234,7 +236,6 @@ export class ApplicationController {
                             url: attachments[prop],
                             applicantId: response['dataValues'].id
                         };
-                        // const attachmentObject = await this.processAttachments(attachmentObj);
                         applicantAttachments.push(attachmentObj);
                     }
                     await this.persistApplicantAttachments(applicantAttachments);

@@ -14,7 +14,6 @@ eventEmmitter.on("BCInsert", async(payload) => {
         ...data,
         registeredProfessionalNumber: payload.registeredProfessionalRegistrationNumber,
         secondName: payload.middleName,
-        category: payload.profession === 'OTHERS' ? 'OTHERS' : payload.profession,
         ...physicalAddress,
         eMail: payload.email,
         phone: payload.phoneNumber,
