@@ -72,8 +72,8 @@ eventEmmitter.on("syncBC", async () => {
             attributes: ['applicantId'],
             include: [{ model: Biodata, include: [Address, ProfessionalBody, Education, Attachment, WorkExperience, Essay] }]
         });
-        application.forEach(async(app) => {
-            const biodata = app['dataValues'].Biodatum['dataValues'];
+        application.forEach(async(appl) => {
+            const biodata = appl['dataValues'].Biodatum['dataValues'];
             let dob = new Date(biodata.dob);
             biodata.dob = dob.toISOString().split('T')[0]
             const {
@@ -139,7 +139,7 @@ eventEmmitter.on("syncBC", async () => {
             }
             const { success, error } = await BCINSTANCE.postapplicant(bcPayload);
             if (success) {
-                const updateApplication = await Application.findOne({ where: { applicantId: app['dataValues'].applicantId } });
+                const updateApplication = await Application.findOne({ where: { applicantId: appl['dataValues'].applicantId } });
                 if (updateApplication) {
                     await updateApplication.update({ synced: true });
                 }
