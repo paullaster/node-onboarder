@@ -50,7 +50,6 @@ eventEmmitter.on("BCInsert", async(payload) => {
             await updateApplication.update({ synced: true });
         }
     }else {
-        console.log("FAILED EDUCATION: ", payload);
         console.error(`Error in BC Insert: ${error}`);
     }
 });

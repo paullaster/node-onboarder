@@ -32,6 +32,9 @@ export class ApplicationController {
             if (!req.body) {
                 return res.ApiResponse.error(500, "Error while submitting application",);
             }
+            if (!req.body.category) {
+                return res.ApiResponse.error(500, "Please submit your application again!, category error. if the error persist, hard reload and try again!",);
+            }
             // VALIDATIONS
             const { success:ed, } = await validationMiddleware.education(req.body.education);
             
