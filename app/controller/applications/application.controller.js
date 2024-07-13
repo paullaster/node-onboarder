@@ -10,6 +10,7 @@ import { fileTypeFromBuffer } from "file-type";
 import fs from "fs";
 import eventEmmitter from "../../events/emmitter/event.emitter.js";
 import { makeid } from "../../../util/random.string.js";
+import validationMiddleware from "../../middleware/validation.middleware.js";
 export class ApplicationController {
     constructor() {
         this.applicant = null;
@@ -33,6 +34,18 @@ export class ApplicationController {
             const applicationExist = await Biodata.findOne({ attributes: ['email'], where: { email: req.body.email } });
             if (applicationExist) {
                 return res.ApiResponse.error(409, "Application already submitted for this email");
+            }
+
+            // VALIDATIONS
+            const { success:ed } = await validationMiddleware.education(req.body.education);
+            if (!ed) {
+                return res.ApiResponse.error(400, "Error while submitting application. Invalid education record.: ");
+            }
+            if (req.body.professionalBodys?.length) {
+                const { success:org} = await validationMiddleware.professionalBody(req.body.professionalBodys);
+            if (!org) {
+                return res.ApiResponse.error(400, "Error while submitting application. Invalid professional bodies record.: ");
+            }
             }
             const {
                 physicalAddress,
