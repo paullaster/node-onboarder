@@ -58,20 +58,6 @@ class Validator {
                         isValid = false;
                         return { success: false, message: "NA" };
                     }
-                    if (typeof education[prop] === "string") {
-                        education[prop]
-                            .trim()
-                            .split('')
-                            .forEach((c) => {
-                                if (space.test(c)) {
-                                    emptySpace = true;
-                                }
-                            })
-                    }
-                    if (emptySpace) {
-                        isValid = false;
-                        return { success: false, message: "space is empty" };
-                    }
                 }
             })
             return { success: isValid, message: "" };
@@ -97,18 +83,6 @@ class Validator {
                     if (na.test(org[prop])) {
                         isValid = false;
                         return { success: false, message: "NA" };
-                    }
-                    org[prop]
-                        .trim()
-                        .split('')
-                        .forEach((c) => {
-                            if (space.test(c)) {
-                                emptySpace = true;
-                            }
-                        })
-                    if (emptySpace) {
-                        isValid = false;
-                        return { success: false, message: "EMPTY SPACE" };
                     }
                 }
             })
