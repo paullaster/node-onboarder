@@ -8,7 +8,6 @@ import WorkExperience from "../../model/workexperience.js";
 import Essay from "../../model/essay.js";
 import { fileTypeFromBuffer } from "file-type";
 import fs from "fs";
-import app from "../../../config/app.js";
 import eventEmmitter from "../../events/emmitter/event.emitter.js";
 import { makeid } from "../../../util/random.string.js";
 export class ApplicationController {
@@ -67,37 +66,17 @@ export class ApplicationController {
                     }
                     await this.persistApplicantAttachments(applicantAttachments);
                     await this.persistApplication();
-                    const { middleName, email, phoneNumber, registeredProfessionalRegistrationNumber, ...data } = rest;
-                    const payload = {
-                        ...data,
-                        registeredProfessionalNumber: rest.registeredProfessionalRegistrationNumber,
-                        secondName: rest.middleName,
-                        category: rest.profession === 'OTHERS' ? 'OTHERS' : rest.profession,
-                        ...physicalAddress,
-                        eMail: rest.email,
-                        phone: rest.phoneNumber,
-                        education: education.map(ed => {
-                            return {
-                                institution: ed.institution,
-                                startDate: `${ed.yearOfStart}-01-01`,
-                                endDate: `${ed.yearOfGraduation}-12-31`,
-                                graduationDate: `${ed.yearOfGraduation}-12-31`,
-                                qualificationDescription: ed.degree,
-                                level: ed.educationLevel,
-                            }
-                        }),
-                        experience: [{ nameOfFirm: workExperience.companyName, positionHeld: workExperience.jobTitle, responsibilitiesDescription: workExperience.jobDescription, current: rest.currentlyEmployed }],
-                        professionalBody: professionalBodys,
-                        applicationAttachments: applicantAttachments.map(attachment => ({ name: attachment.name, link: `${app.url}/${attachment.url}` })),
-                    };
-                    eventEmmitter.emit('BCInsert', { payload, applicantId: this.applicantId });
+                    req.body.applicantAttachments = applicantAttachments;
+                    req.body.applicantId = this.applicantId;
+                    req.body.dob = rest.dob;
+                    eventEmmitter.emit('BCInsert', req.body);
                     eventEmmitter.emit("applicationSubmitted", this.applicant);
                     return res.ApiResponse.success({}, 201, "Application submitted successfully");
                 })
                 .catch((error) => {
                     console.log("FAILED BIODATA BODY", rest);
-                    console.log("BIODATA VALIDATION", error);
-                    return res.ApiResponse.error(500, "Error while submitting application " + error.message);
+                    console.log("BIODATA VALIDATION", error?.errors[0]?.message || error);
+                    return res.ApiResponse.error(500, "Error while submitting application:  " + error.errors[0].message || error.message);
                 });
         } catch (error) {
             return res.ApiResponse.error(500, "Error while submitting application " + error.message);
