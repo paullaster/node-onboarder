@@ -31,11 +31,6 @@ export class ApplicationController {
             if (!req.body) {
                 return res.ApiResponse.error(500, "Error while submitting application",);
             }
-            const applicationExist = await Biodata.findOne({ attributes: ['email'], where: { email: req.body.email } });
-            if (applicationExist) {
-                return res.ApiResponse.error(409, "Application already submitted for this email");
-            }
-
             // VALIDATIONS
             const { success:ed } = await validationMiddleware.education(req.body.education);
             if (!ed) {
