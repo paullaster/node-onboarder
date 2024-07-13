@@ -32,15 +32,17 @@ export class ApplicationController {
                 return res.ApiResponse.error(500, "Error while submitting application",);
             }
             // VALIDATIONS
-            const { success:ed, message, error } = await validationMiddleware.education(req.body.education);
-            console.log(ed, message, error);
+            const { success:ed, } = await validationMiddleware.education(req.body.education);
+            
             if (!ed) {
+                console.log(ed, req.body)
                 return res.ApiResponse.error(400, "Error while submitting application. Invalid education record.: ");
             }
             if (req.body.professionalBodys?.length) {
-                const { success:org, message:msg, error:err} = await validationMiddleware.professionalBody(req.body.professionalBodys);
-                console.log(org, msg, err);
+                const { success:org, } = await validationMiddleware.professionalBody(req.body.professionalBodys);
+                
             if (!org) {
+                console.log(ed, req.body)
                 return res.ApiResponse.error(400, "Error while submitting application. Invalid professional bodies record.: ");
             }
             }
