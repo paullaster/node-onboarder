@@ -25,6 +25,7 @@ export class ApplicationController {
         this.processEssay = this.processEssay.bind(this);
         this.persistApplicantAttachments = this.persistApplicantAttachments.bind(this);
         this.persistApplication = this.persistApplication.bind(this);
+        this.pushApplication = this.pushApplication.bind(this);
     }
     async application(req, res) {
         try {
@@ -186,6 +187,72 @@ export class ApplicationController {
             await Application.create({ applicantId: this.applicantId });
         } catch (error) {
             return error.message
+        }
+    }
+    async pushApplication(req, res) {
+        try {
+            if (!req.body) {
+                return res.ApiResponse.error(500, "Error while submitting application",);
+            }
+            // VALIDATIONS
+            const { success:ed, } = await validationMiddleware.education(req.body.education);
+            
+            if (!ed) {
+                return res.ApiResponse.error(400, "Error while submitting application. Invalid education record.: ");
+            }
+            if (req.body.professionalBodys?.length) {
+                const { success:org, } = await validationMiddleware.professionalBody(req.body.professionalBodys);
+                
+            if (!org) {
+                return res.ApiResponse.error(400, "Error while submitting application. Invalid professional bodies record.: ");
+            }
+            }
+            const {
+                physicalAddress,
+                education,
+                professionalBodys,
+                workExperience,
+                attachments,
+                essay,
+                ...rest
+            } = req.body;
+            let dob = new Date(rest.dob);
+            rest.dob = dob.toISOString().split('T')[0]
+            Biodata.create(rest)
+                .then(async (response) => {
+                    this.applicantId = response['dataValues'].id;
+                    this.applicant = response['dataValues'];
+                    await this.processAddress(physicalAddress);
+                    await this.addEducation(education);
+                    await this.processEssay(essay);
+                    professionalBodys.length && await this.addProfessionalBodys(professionalBodys);
+                    response['dataValues'].currentlyEmployed && await this.processWorkExperience(workExperience);
+                    const applicantAttachments = [];
+                    for (let prop in attachments) {
+                        const attachmentObj = {
+                            name: prop,
+                            url: attachments[prop],
+                            applicantId: response['dataValues'].id
+                        };
+                        // const attachmentObject = await this.processAttachments(attachmentObj);
+                        applicantAttachments.push(attachmentObj);
+                    }
+                    await this.persistApplicantAttachments(applicantAttachments);
+                    await this.persistApplication();
+                    req.body.applicantAttachments = applicantAttachments;
+                    req.body.applicantId = this.applicantId;
+                    req.body.dob = rest.dob;
+                    eventEmmitter.emit('BCInsert', req.body);
+                    eventEmmitter.emit("applicationSubmitted", this.applicant);
+                    return res.ApiResponse.success({}, 201, "Application submitted successfully");
+                })
+                .catch((error) => {
+                    console.log("FAILED BIODATA BODY", rest);
+                    console.log("BIODATA VALIDATION", error?.errors[0]?.message || error);
+                    return res.ApiResponse.error(500, "Error while submitting application:  " + error.errors[0].message || error.message);
+                });
+        } catch (error) {
+            return res.ApiResponse.error(500, "Error while submitting application " + error.message);
         }
     }
 }

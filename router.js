@@ -14,6 +14,7 @@ const appRouter = express.Router();
 appRouter.post('/application', new ApplicationController().application);
 appRouter.get('/applications', new ApplicationsController().applications);
 appRouter.get('/application/:id', new ApplicationsController().application);
+appRouter.post('/application/push', new ApplicationController().pushApplication);
 
 // AUTH
 appRouter.post('/auth/login', new UserController().login);
