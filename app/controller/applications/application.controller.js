@@ -33,20 +33,44 @@ export class ApplicationController {
                 return res.ApiResponse.error(500, "Error while submitting application",);
             }
             if (!req.body.category) {
-                return res.ApiResponse.error(500, "Please submit your application again!, category error. if the error persist, hard reload and try again!",);
+                const categories_map = 
+                [
+                    "STRUCTURAL ENGINEERI",
+                    "ARCHITECTURE",
+                    "QUANTITY SURVEYING",
+                    "CONSTRUCTION MAN.",
+                    "CIVIL ENGINEERING",
+                    "MECHANICAL ENG.",
+                    "ELECTRICAL ENG.",
+                    "LAND SURVEYORS",
+                    "GEOINFORMATICS",
+                    "LANDSCAPE ARCH.",
+                    "INTERIOR DESIGN",
+                    "SOCIAL DEVELOPMENT",
+                    "URBAN & REG. PLANNIN",
+                    "ENVIRONMENTAL SCI.",
+                    "HEALTH AND SAFETY",
+                    "COMM & BRANDING",
+                    "ICT",
+                ];
+                if (!categories_map.includes(req.body.profession)) {
+                    req.body.category = "OTHERS";
+                }else {
+                    req.body.category = req.body.profession;
+                }
             }
             // VALIDATIONS
-            const { success:ed, } = await validationMiddleware.education(req.body.education);
-            
+            const { success: ed, } = await validationMiddleware.education(req.body.education);
+
             if (!ed) {
                 return res.ApiResponse.error(400, "Error while submitting application. Invalid education record.: ");
             }
             if (req.body.professionalBodys?.length) {
-                const { success:org, } = await validationMiddleware.professionalBody(req.body.professionalBodys);
-                
-            if (!org) {
-                return res.ApiResponse.error(400, "Error while submitting application. Invalid professional bodies record.: ");
-            }
+                const { success: org, } = await validationMiddleware.professionalBody(req.body.professionalBodys);
+
+                if (!org) {
+                    return res.ApiResponse.error(400, "Error while submitting application. Invalid professional bodies record.: ");
+                }
             }
             const {
                 physicalAddress,
@@ -199,17 +223,17 @@ export class ApplicationController {
                 return res.ApiResponse.error(500, "Error while submitting application",);
             }
             // VALIDATIONS
-            const { success:ed, } = await validationMiddleware.education(req.body.education);
-            
+            const { success: ed, } = await validationMiddleware.education(req.body.education);
+
             if (!ed) {
                 return res.ApiResponse.error(400, "Error while submitting application. Invalid education record.: ");
             }
             if (req.body.professionalBodys?.length) {
-                const { success:org, } = await validationMiddleware.professionalBody(req.body.professionalBodys);
-                
-            if (!org) {
-                req.body.professionalBodys = [];
-            }
+                const { success: org, } = await validationMiddleware.professionalBody(req.body.professionalBodys);
+
+                if (!org) {
+                    req.body.professionalBodys = [];
+                }
             }
             const {
                 physicalAddress,
