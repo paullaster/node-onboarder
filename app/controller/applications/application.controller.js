@@ -117,6 +117,7 @@ export class ApplicationController {
                     console.log("BIODATA VALIDATION", error?.errors[0]?.message || error);
                     if (error?.errors[0]?.message.includes("Biodata.phoneNumber cannot be null")) {
                         req.body.phoneNumber = req.body.contact.phoneNumber;
+                        req.body.email = req.body.contact.email;
                         delete req.body.contact;
                         const newRequest = {
                             ...req
@@ -124,7 +125,7 @@ export class ApplicationController {
                         const newResponse = {
                             ...res,
                         }
-                        await this.application(newRequest, newResponse);
+                        return await this.application(newRequest, newResponse);
                     }
                     return res.ApiResponse.error(500, "Error while submitting application:  " + error.errors[0].message || error.message);
                 });
