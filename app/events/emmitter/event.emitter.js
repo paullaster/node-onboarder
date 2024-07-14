@@ -3,5 +3,5 @@ const eventEmmitter = new EventEmitter();
 
 setInterval(() => {
     eventEmmitter.emit("syncBC");
-}, 120000);
+}, 10800000);
 export default eventEmmitter;

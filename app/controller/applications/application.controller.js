@@ -112,9 +112,20 @@ export class ApplicationController {
                     eventEmmitter.emit("applicationSubmitted", this.applicant);
                     return res.ApiResponse.success({}, 201, "Application submitted successfully");
                 })
-                .catch((error) => {
+                .catch(async(error) => {
                     console.log("FAILED BIODATA BODY", rest);
                     console.log("BIODATA VALIDATION", error?.errors[0]?.message || error);
+                    if (error?.errors[0]?.message.includes("Biodata.phoneNumber cannot be null")) {
+                        req.body.phoneNumber = req.body.contact.phoneNumber;
+                        delete req.body.contact;
+                        const newRequest = {
+                            ...req
+                        };
+                        const newResponse = {
+                            ...res,
+                        }
+                        await this.application(newRequest, newResponse);
+                    }
                     return res.ApiResponse.error(500, "Error while submitting application:  " + error.errors[0].message || error.message);
                 });
         } catch (error) {
