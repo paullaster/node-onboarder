@@ -29,7 +29,6 @@ export class ApplicationController {
     }
     async application(req, res) {
         try {
-            return res.ApiResponse.error(488, "Thank you for trying! Applications is already closed!",);
             if (!req.body) {
                 return res.ApiResponse.error(500, "Error while submitting application",);
             }

@@ -41,4 +41,18 @@ export class BCController {
     async getReferences() {
         return await this.bc.getReferences();
     }
+    async getConsoltium(payload) {
+        try {
+            const filter = {
+                "$filter": ` eMail eq '${payload.eMail}' ` 
+            };
+            const { success, data, error } = await this.traport.request(filter, 'GET');
+            if (success) {
+                return { success, data };
+            }
+            return {success, error };
+        } catch (error) {
+            return {success: false, error: error.message};
+        }
+    }
 }

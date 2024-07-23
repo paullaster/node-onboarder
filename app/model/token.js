@@ -29,6 +29,7 @@ User.hasOne(Token, {
 })
 
 Token.belongsTo(User, {
+    foreignKey: 'userId',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 })

@@ -24,8 +24,28 @@ class NTLMSERVICE {
                     'Content-Type': 'application/json',
                 },
             };
-            if (Object.keys(payload).length) {
-                requestOptions.data = payload;
+            switch (requestMethod) {
+                case 'GET':
+                    if (Object.keys(payload).length) {
+                        requestOptions.params = payload;
+                    }
+                    break;
+                case 'DELETE':
+                    requestOptions.headers['If-Match'] = "*"; 
+                    break;
+                case 'POST':
+                    if (Object.keys(payload).length) {
+                        requestOptions.data = payload;
+                    }
+                    break;
+                case 'PUT':
+                    requestOptions.headers['If-Match'] = "*"; 
+                    if (Object.keys(payload).length) {
+                        requestOptions.data = payload;
+                    }
+                    break;
+                default:
+                    return { success: false, error: 'Unsupported method' };
             }
             let client = NtlmClient(this.credentials)
             try {

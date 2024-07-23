@@ -13,10 +13,10 @@ const User = sequelize.define('User',{
         unique: false,
     },
     role: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
         unique: false,
-        defaultValue: 10,
+        defaultValue: 'user',
     },
     password: {
         type: DataTypes.TEXT,
@@ -39,6 +39,27 @@ const User = sequelize.define('User',{
         type: DataTypes.STRING,
         allowNull: true,
         unique: false
+    },
+    consoltium:{
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: false
+    },
+    belongsTo:{
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: false
+    },
+    title:{
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: false
+    },
+    emailed:{
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        unique: false,
+        defaultValue: false
     }
 },
 {
