@@ -57,6 +57,8 @@ export class UserController {
                 active: false,
                 belongsTo: user.belongsTo ?? null,
                 title: user.title ?? null,
+                categoriesFilter: user.categoriesFilter,
+                countiesFilter: user.countiesFilter
             };
             const createdUser = await User.create(newUser);
             if (!createdUser) return res.ApiResponse.error(409, "Sorry!, We ran into an error while activating the user");

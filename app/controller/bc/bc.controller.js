@@ -26,20 +26,34 @@ export class BCController {
         }
     }
 
-    async getEducation() {
-        return await this.bc.getEducation();
+    async getApplications(filters) {
+        try {
+            const filter = {
+                "$filter": filters,
+                "$expand": "*",
+            };
+            const { success, data, error } = await this.traport.request(filter, 'GET');
+            if (success) {
+                return { success, data };
+            }
+            return {success, error };
+        } catch (error) {
+            return {success: false, error: error.message};
+        }
     }
-
-    async getEssay() {
-        return await this.bc.getEssay();
-    }
-
-    async getSkills() {
-        return await this.bc.getSkills();
-    }
-
-    async getReferences() {
-        return await this.bc.getReferences();
+    async getApplication () {
+        try {
+            const filter = {
+                "$expand": "*",
+            };
+            const { success, data, error } = await this.traport.request(filter, 'GET');
+            if (success) {
+                return { success, data };
+            }
+            return {success, error };
+        } catch (error) {
+            return {success: false, error: error.message};
+        }
     }
     async getConsoltium(payload) {
         try {

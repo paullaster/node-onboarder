@@ -60,6 +60,16 @@ const User = sequelize.define('User',{
         allowNull: false,
         unique: false,
         defaultValue: false
+    },
+    categoriesFilter:{
+        type: DataTypes.TEXT,
+        allowNull: true,
+        unique: false,
+    },
+    countiesFilter:{
+        type: DataTypes.TEXT,
+        allowNull: true,
+        unique: false,
     }
 },
 {
