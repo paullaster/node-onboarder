@@ -24,12 +24,11 @@ export class UserController {
                 return res.ApiResponse.error(404, "User not found");
             };
             
-            const isPasswordMatch = await bcrypt.compare(password, user['dataValues'].password)
-            console.log(isPasswordMatch);
+            const isPasswordMatch = await bcrypt.compare(password, user['dataValues'].password);
             if (!isPasswordMatch) {
                 return res.ApiResponse.error(401, 'Invalid password');
             }
-            const token = jwt.sign({ userId: user.email, email: user.email }, app.key, { algorithm: 'HS512', expiresIn: '10h' });
+            const token = jwt.sign({ id: user['dataValues'].id, email: user['dataValues'].email, name: user['dataValues'].name, role: user['dataValues'].role }, app.key, { algorithm: 'HS512', expiresIn: '10h' });
             return res.ApiResponse.success(token, 200, "Login successful");
         } catch (error) {
             
@@ -82,7 +81,25 @@ export class UserController {
         }
     }
     async forgotPassword(req, res) { }
-    async resetPassword(req, res) { }
+    async setPassword(req, res) { 
+        try {
+            if (!req.body) return res.ApiResponse.error(500, "Invalid body");
+            const token = jwt.verify(req.body.token, app.key, {algorithms: 'HS512'});
+            if (!token.email) return res.ApiResponse.error(401, "Invalid token");
+            const user = await User.findOne({where: {email: token.email}});
+            if (!user) return res.ApiResponse.error(404, "User not found");
+            const saltRounds = 10;
+            const salt = await bcrypt.genSalt(saltRounds);
+            user.password = await bcrypt.hash(req.body.password, salt);
+            user.active = true;
+            const usedToken = await Token.findOne({ where: { userId: user['dataValues'].id}});
+            if (usedToken) await usedToken.destroy();
+            await user.save();
+            return res.ApiResponse.success({}, 200, "User password was set successfully");
+        } catch (error) {
+            return res.ApiResponse.error(500, "Error while creating user password:  " + error.message);
+        }
+     }
     async addConsotium(req, res) {
         try {
             if (!req.body) return res.ApiResponse.error(500, "Missing payload");
