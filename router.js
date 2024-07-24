@@ -3,6 +3,7 @@ import { ApplicationController } from './app/controller/applications/application
 import { ApplicationsController } from './app/controller/applications/get.controller.js';
 import { setupRoutes } from './routes/setup.routes.js';
 import { userRoutes } from './routes/user.routes.js';
+import { validateUserToken } from './app/middleware/verify.user.token.js';
 
 
 const appRouter = express.Router();
@@ -12,8 +13,8 @@ const appRouter = express.Router();
 
 // APPLICATIONS
 // appRouter.post('/application', new ApplicationController().application);
-appRouter.get('/applications', new ApplicationsController().applications);
-appRouter.get('/application/:id', new ApplicationsController().application);
+appRouter.get('/applications', validateUserToken, new ApplicationsController().applications);
+appRouter.get('/application/:id', validateUserToken, new ApplicationsController().application);
 appRouter.post('/application/push', new ApplicationController().pushApplication);
 
 // AUTH

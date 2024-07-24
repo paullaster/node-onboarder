@@ -32,12 +32,12 @@ eventEmmitter.on("activate-account", async(payload) => {
             eventEmmitter.emit('complete-email');
         }
     }
-    //else {
-    //     if (getUser) {
-    //         await getUser.destroy();
-    //     }
-    //     eventEmmitter.emit('email-failed');
-    // }
+    else {
+        if (getUser) {
+            await getUser.destroy();
+        }
+        eventEmmitter.emit('email-failed');
+    }
     } catch (error) {
         console.log({error: error.message});
     }
