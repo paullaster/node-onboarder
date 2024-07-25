@@ -70,6 +70,12 @@ const User = sequelize.define('User',{
         type: DataTypes.TEXT,
         allowNull: true,
         unique: false,
+    },
+    isAdmin: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        unique: false,
+        defaultValue: false,
     }
 },
 {
