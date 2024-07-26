@@ -28,7 +28,14 @@ export class UserController {
             if (!isPasswordMatch) {
                 return res.ApiResponse.error(401, 'Invalid password');
             }
-            const token = jwt.sign({ id: user['dataValues'].id, email: user['dataValues'].email, name: user['dataValues'].name, role: user['dataValues'].role }, app.key, { algorithm: 'HS512', expiresIn: '10h' });
+            const token = jwt.sign(
+                { 
+                    id: user['dataValues'].id,
+                    email: user['dataValues'].email, 
+                     name: user['dataValues'].name, 
+                     role: user['dataValues'].role,
+                     categoriesFilter: user['dataValues'].categoriesFilter
+                }, app.key, { algorithm: 'HS512', expiresIn: '10h' });
             return res.ApiResponse.success(token, 200, "Login successful");
         } catch (error) {
             
