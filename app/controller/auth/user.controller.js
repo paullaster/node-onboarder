@@ -34,7 +34,8 @@ export class UserController {
                     email: user['dataValues'].email, 
                      name: user['dataValues'].name, 
                      role: user['dataValues'].role,
-                     categoriesFilter: user['dataValues'].categoriesFilter
+                     categoriesFilter: user['dataValues'].categoriesFilter,
+                     consoltium: user['dataValues'].consoltium
                 }, app.key, { algorithm: 'HS512', expiresIn: '10h' });
             return res.ApiResponse.success(token, 200, "Login successful");
         } catch (error) {

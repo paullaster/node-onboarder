@@ -11,6 +11,8 @@ import fs from "fs";
 import eventEmmitter from "../../events/emmitter/event.emitter.js";
 import { makeid } from "../../../util/random.string.js";
 import validationMiddleware from "../../middleware/validation.middleware.js";
+import NTLMSERVICE from "../../services/ntlm.service.js";
+import { BCController } from "../bc/bc.controller.js";
 export class ApplicationController {
     constructor() {
         this.applicant = null;
@@ -26,6 +28,7 @@ export class ApplicationController {
         this.persistApplicantAttachments = this.persistApplicantAttachments.bind(this);
         this.persistApplication = this.persistApplication.bind(this);
         this.pushApplication = this.pushApplication.bind(this);
+        this.acceptApplication = this.acceptApplication.bind(this);
     }
     async application(req, res) {
         try {
@@ -293,6 +296,30 @@ export class ApplicationController {
                 });
         } catch (error) {
             return res.ApiResponse.error(500, "Error while submitting application " + error.message);
+        }
+    }
+    async acceptApplication(req, res) {
+        try {
+            if (!req.body) {
+                return res.ApiResponse.error(500, "Error while accepting application",);
+            }
+            const bcPayload = {
+                ...req.body,
+                consortia: req.user.consoltium
+            };
+            const params = {
+                company: 'CRONUS International Ltd.',
+            };
+            const  transport = new NTLMSERVICE('AHPRecruitmentManager_OnboardApplication', true);
+            const bcInstance = new BCController(transport);
+            const { success, data: application, error } = await bcInstance.OnboardApplication(bcPayload, params);
+            if (success) {
+                return res.ApiResponse.success(application, 200, "Application accepted successfully");
+            }else {
+                return res.ApiResponse.error(500, "Error while accepting application:  " + error);
+            }
+        } catch (error) {
+            return res.ApiResponse.error(500, "Error while accepting application: " + error.message);
         }
     }
 }

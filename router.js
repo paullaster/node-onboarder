@@ -16,7 +16,7 @@ const appRouter = express.Router();
 appRouter.get('/applications', validateUserToken, new ApplicationsController().applications);
 appRouter.get('/application/:id', validateUserToken, new ApplicationsController().application);
 appRouter.post('/application/push', new ApplicationController().pushApplication);
-
+appRouter.post('/accept/application', validateUserToken, new ApplicationController().acceptApplication);
 // AUTH
 appRouter.use('/auth', userRoutes);
 

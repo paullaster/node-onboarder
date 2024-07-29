@@ -3,6 +3,8 @@ export class BCController {
         this.traport = traport;
         this.postapplicant = this.postapplicant.bind(this);
         this.getSetups = this.getSetups.bind(this);
+        this.OnboardApplication = this.OnboardApplication.bind(this);
+        this.getConsoltium = this.getConsoltium.bind(this);
     }
 
     async postapplicant(applicant) {
@@ -32,7 +34,7 @@ export class BCController {
                 "$filter": filters,
                 "$expand": "*",
             };
-            const { success, data, error } = await this.traport.request(filter, 'GET');
+            const { success, data, error } = await this.traport.request({}, 'GET', filter);
             if (success) {
                 return { success, data };
             }
@@ -46,7 +48,7 @@ export class BCController {
             const filter = {
                 "$expand": "*",
             };
-            const { success, data, error } = await this.traport.request(filter, 'GET');
+            const { success, data, error } = await this.traport.request({}, 'GET', filter);
             if (success) {
                 return { success, data };
             }
@@ -60,7 +62,18 @@ export class BCController {
             const filter = {
                 "$filter": ` eMail eq '${payload.eMail}' ` 
             };
-            const { success, data, error } = await this.traport.request(filter, 'GET');
+            const { success, data, error } = await this.traport.request({}, 'GET', filter);
+            if (success) {
+                return { success, data };
+            }
+            return {success, error };
+        } catch (error) {
+            return {success: false, error: error.message};
+        }
+    }
+    async OnboardApplication(payload, params) {
+        try {
+            const { success, data, error } = await this.traport.request(payload, 'POST', params);
             if (success) {
                 return { success, data };
             }

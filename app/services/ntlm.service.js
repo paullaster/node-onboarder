@@ -1,22 +1,27 @@
 
 import bc from "../../config/bc.js";
 import { NtlmClient } from "axios-ntlm";
-const { company, username, password, domain, url } = bc;
+const { company, username, password, domain, url, odata_url } = bc;
 
 class NTLMSERVICE {
-    constructor(entity) {
+    constructor(entity, odata = false, provider = null, company = null ) {
         this.entity = entity;
         this.credentials = {
             username: username,
             password: password,
             domain: domain
         }
+        this.odata = odata;
         this.url = `${url}/${this.entity}`;
+        this.odata_url = `${odata_url}/${this.entity}`
         this.request = this.request.bind(this);
     }
-    async request(payload = {}, method = 'GET') {
+    async request(payload = {}, method = 'GET', params = {}) {
         try {
             const requestMethod = method.toUpperCase();
+            if (this.odata) {
+                this.url = this.odata_url;
+            }
             const requestOptions = {
                 url: this.url,
                 method: requestMethod,
@@ -24,11 +29,11 @@ class NTLMSERVICE {
                     'Content-Type': 'application/json',
                 },
             };
+            if (Object.keys(params).length) {
+                requestOptions.params = params;
+            }
             switch (requestMethod) {
                 case 'GET':
-                    if (Object.keys(payload).length) {
-                        requestOptions.params = payload;
-                    }
                     break;
                 case 'DELETE':
                     requestOptions.headers['If-Match'] = "*"; 
