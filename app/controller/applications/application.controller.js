@@ -36,29 +36,29 @@ export class ApplicationController {
                 return res.ApiResponse.error(500, "Error while submitting application",);
             }
             if (!req.body.category) {
-                const categories_map = 
-                [
-                    "STRUCTURAL ENGINEERI",
-                    "ARCHITECTURE",
-                    "QUANTITY SURVEYING",
-                    "CONSTRUCTION MAN.",
-                    "CIVIL ENGINEERING",
-                    "MECHANICAL ENG.",
-                    "ELECTRICAL ENG.",
-                    "LAND SURVEYORS",
-                    "GEOINFORMATICS",
-                    "LANDSCAPE ARCH.",
-                    "INTERIOR DESIGN",
-                    "SOCIAL DEVELOPMENT",
-                    "URBAN & REG. PLANNIN",
-                    "ENVIRONMENTAL SCI.",
-                    "HEALTH AND SAFETY",
-                    "COMM & BRANDING",
-                    "ICT",
-                ];
+                const categories_map =
+                    [
+                        "STRUCTURAL ENGINEERI",
+                        "ARCHITECTURE",
+                        "QUANTITY SURVEYING",
+                        "CONSTRUCTION MAN.",
+                        "CIVIL ENGINEERING",
+                        "MECHANICAL ENG.",
+                        "ELECTRICAL ENG.",
+                        "LAND SURVEYORS",
+                        "GEOINFORMATICS",
+                        "LANDSCAPE ARCH.",
+                        "INTERIOR DESIGN",
+                        "SOCIAL DEVELOPMENT",
+                        "URBAN & REG. PLANNIN",
+                        "ENVIRONMENTAL SCI.",
+                        "HEALTH AND SAFETY",
+                        "COMM & BRANDING",
+                        "ICT",
+                    ];
                 if (!categories_map.includes(req.body.profession)) {
                     req.body.category = "OTHERS";
-                }else {
+                } else {
                     req.body.category = req.body.profession;
                 }
             }
@@ -115,7 +115,7 @@ export class ApplicationController {
                     eventEmmitter.emit("applicationSubmitted", this.applicant);
                     return res.ApiResponse.success({}, 201, "Application submitted successfully");
                 })
-                .catch(async(error) => {
+                .catch(async (error) => {
                     console.log("FAILED BIODATA BODY", rest);
                     console.log("BIODATA VALIDATION", error?.errors[0]?.message || error);
                     if (error?.errors[0]?.message.includes("Biodata.phoneNumber cannot be null")) {
@@ -310,16 +310,51 @@ export class ApplicationController {
             const params = {
                 company: 'CRONUS International Ltd.',
             };
-            const  transport = new NTLMSERVICE('AHPRecruitmentManager_OnboardApplication', true);
+            const transport = new NTLMSERVICE('AHPRecruitmentManager_OnboardApplication', true);
             const bcInstance = new BCController(transport);
             const { success, data: application, error } = await bcInstance.OnboardApplication(bcPayload, params);
             if (success) {
                 return res.ApiResponse.success(application, 200, "Application accepted successfully");
-            }else {
+            } else {
                 return res.ApiResponse.error(500, "Error while accepting application:  " + error);
             }
         } catch (error) {
             return res.ApiResponse.error(500, "Error while accepting application: " + error.message);
+        }
+    }
+    async acceptBatchApplications(req, res) {
+        try {
+            if (!req.body) {
+                return res.ApiResponse.error(500, "Error while accepting batch applications",);
+            }
+
+            const params = {
+                company: 'CRONUS International Ltd.',
+            };
+            if (!Array.isArray(req.body)) {
+                return res.ApiResponse.error(400, "Expected array payload!");
+            }
+            const transport = new NTLMSERVICE('AHPRecruitmentManager_OnboardApplication', true);
+            const bcInstance = new BCController(transport);
+            const len = req.body?.length;
+            const consortia = req.user.consoltium;
+            req.body.forEach(async (app, index) => {
+                const payload = {
+                    no: app,
+                    consortia,
+                };
+                if (len - index === 1) {
+                    const { success, data: applications, error } = await bcInstance.OnboardApplication(payload, params);
+                    if (success) {
+                        return res.ApiResponse.success(applications, 200, "Applications accepted successfully");
+                    } else {
+                        return res.ApiResponse.error(500, "Error while accepting", error);
+                    }
+                }
+                await bcInstance.OnboardApplication(payload);
+            });
+        } catch (error) {
+            return res.ApiResponse.error(500, "Error while accepting batch applications: " + error.message);
         }
     }
 }

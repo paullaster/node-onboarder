@@ -17,6 +17,7 @@ appRouter.get('/applications', validateUserToken, new ApplicationsController().a
 appRouter.get('/application/:id', validateUserToken, new ApplicationsController().application);
 appRouter.post('/application/push', new ApplicationController().pushApplication);
 appRouter.post('/accept/application', validateUserToken, new ApplicationController().acceptApplication);
+appRouter.post('/batch/accept/applications', validateUserToken, new ApplicationController().acceptBatchApplications);
 // AUTH
 appRouter.use('/auth', userRoutes);
 
