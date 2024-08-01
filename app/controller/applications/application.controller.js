@@ -316,9 +316,10 @@ export class ApplicationController {
             if (success) {
                 return res.ApiResponse.success(application, 200, "Application accepted successfully");
             } else {
-                return res.ApiResponse.error(500, "Error while accepting application:  " + error);
+                return res.ApiResponse.error(514, "Error while accepting application:  " + error);
             }
         } catch (error) {
+            console.log(error);
             return res.ApiResponse.error(500, "Error while accepting application: " + error.message);
         }
     }
