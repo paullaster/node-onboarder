@@ -69,6 +69,7 @@ eventEmmitter.on("syncBC", async () => {
         // Get APPLICANT
         const application = await Application.findAll({
             where: { synced: false },
+            limit: 1000,
             attributes: ['applicantId'],
             include: [{ model: Biodata, include: [Address, ProfessionalBody, Education, Attachment, WorkExperience, Essay] }]
         });
@@ -151,3 +152,24 @@ eventEmmitter.on("syncBC", async () => {
         console.error(`Error in BC Insert: ${error}`);
     }
 });
+
+eventEmmitter.on('unsync', async() => {
+    try {
+        let offset = 0;
+        let limit = 10;
+        let applications = await Application.findAndCountAll({ limit: limit, offset: offset});
+        while (applications.count <= Math.ceil(applications.count/limit)) {
+            const applicationsToSync = applications.rows.filter(app =>app.synced);
+            applicationsToSync.forEach(async(app) => {
+                const updateApplication = await Application.findOne({ where: { applicantId: app.applicantId } });
+                if (updateApplication) {
+                    await updateApplication.update({ synced: false });
+                }
+            });
+            offset += limit;
+            applications = await Application.findAndCountAll({ limit: limit, offset: offset});
+        }
+    } catch (error) {
+        console.error(`Unsync:  ${error}`);
+    }
+})
