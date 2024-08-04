@@ -21,6 +21,11 @@ eventEmmitter.on("activate-account", async(payload) => {
                   Best regards,
                 </p>
                 <p><strong>The AHP Team</strong></p>
+                <footer>
+                  <p>
+                  © ${new Date().getFullYear()} AHP. All rights reserved
+                  </p>
+                </footer>
     `;
     const notify = new Notification(payload.email, subject, mailBody);
     const {success} = await notify.via('viaEmail');

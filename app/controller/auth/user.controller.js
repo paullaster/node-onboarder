@@ -92,7 +92,31 @@ export class UserController {
             return res.ApiResponse.error(500, "Error while activating you account:  " + error.message);
         }
     }
-    async forgotPassword(req, res) { }
+    async forgotPassword(req, res) {
+        try {
+            if (!req.body) return res.ApiResponse.error(500, "Missing payload");
+            if (!req.body.email) return res.ApiResponse.error(500, "Missing email");
+            const user = await User.findOne({where: {email: req.body.email}});
+            if (!user) return res.ApiResponse.error(404, "User not found");
+            const token = jwt.sign({ email: user.email }, app.key, { algorithm: 'HS512', expiresIn: '1h' });
+            const data = {
+                key: token,
+                userId: user['dataValues'].id,
+                expiry: new Date(Date.now() + 3600000),
+            };
+            const userToken = await Token.create(data);
+            const resetLink = `${app.web_url}/auth/set-password/${userToken.key}`;
+            eventEmmitter.emit('forgot-password', {email: user['dataValues'].email, resetLink});
+            eventEmmitter.on('complete-email', ()=> {
+                return res.ApiResponse.success({  }, 200, "Reset password link has been sent to your email.");
+            });
+            eventEmmitter.on('email-failed', ()=> {
+                return res.ApiResponse.error(500, "Failed to send email, please try again later.");
+            });
+        } catch (error) {
+            return res.ApiResponse.error(500, "Error while sending forgot password email:  " + error.message);
+        }
+    }
     async setPassword(req, res) { 
         try {
             if (!req.body) return res.ApiResponse.error(500, "Invalid body");
