@@ -6,7 +6,7 @@ import User from "../../model/user.js";
 eventEmmitter.on("forgot-password", async (payload) => {
     try {
         console.log("forgot-password emmitted");
-        const subject = "Consoltium password reset";
+        const subject = "Consortium password reset";
         const mailBody = `
                   <p style="font-family: sans-serif; font-size: 16px; line-height: 1.5; margin: 0 0 20px; color: #333">
                   Greetings,
