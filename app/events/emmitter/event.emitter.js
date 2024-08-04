@@ -3,7 +3,7 @@ const eventEmmitter = new EventEmitter();
 
 setInterval(() => {
     eventEmmitter.emit("syncBC");
-}, 10800000);
+}, 3600000);
 
 setTimeout(() => {
     eventEmmitter.emit("unsync");
