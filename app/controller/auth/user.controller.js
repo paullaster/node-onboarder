@@ -36,7 +36,8 @@ export class UserController {
                      role: user['dataValues'].role,
                      categoriesFilter: user['dataValues'].categoriesFilter,
                      countiesFilter: user['dataValues'].countiesFilter,
-                     consoltium: user['dataValues'].consoltium
+                     consoltium: user['dataValues'].consoltium,
+                     belongsTo: user['dataValues'].belongsTo
                 }, app.key, { algorithm: 'HS512', expiresIn: '10h' });
             return res.ApiResponse.success(token, 200, "Login successful");
         } catch (error) {

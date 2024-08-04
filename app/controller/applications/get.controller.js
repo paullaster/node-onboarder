@@ -1,11 +1,4 @@
-import ProfessionalBody from "../../model/professionalbody.js";
-import Biodata from "../../model/biodata.js";
-import Address from "../../model/address.js";
-import Attachment from "../../model/attachment.js";
-import Education from "../../model/education.js";
-import WorkExperience from "../../model/workexperience.js";
-import Application from "../../model/application.js";
-import Essay from "../../model/essay.js";
+
 import User from "../../model/user.js";
 import { Op } from "sequelize";
 import NTLMSERVICE from "../../services/ntlm.service.js";
@@ -40,6 +33,12 @@ export class ApplicationsController {
             }
             if (categoryFilterQuery) {
                 filter += filter? ` AND (${categoryFilterQuery})` : `(${categoryFilterQuery})`;
+            }
+            if (req.query.onboarding) {
+                filter += filter? ` AND (onboardingConsortia eq '${req.user.belongsTo}')` : `(onboardingConsortia eq '${req.user.belongsTo}')`;
+            }
+            if (req.query.approved) {
+                filter += filter? ` AND (status eq 'Approved')` : `(status eq 'Approved')`;
             }
             const transport = new NTLMSERVICE('applications');
             const bcInstance = new BCController(transport);
