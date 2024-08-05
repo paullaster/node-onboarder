@@ -23,7 +23,10 @@ export class UserController {
             if (!user) {
                 return res.ApiResponse.error(404, "User not found");
             };
-            
+            if (!user['dataValues'].active) {
+                await user.destroy();
+                return res.ApiResponse.error(401, "Account is not activated");
+            }
             const isPasswordMatch = await bcrypt.compare(password, user['dataValues'].password);
             if (!isPasswordMatch) {
                 return res.ApiResponse.error(401, 'Invalid password');
