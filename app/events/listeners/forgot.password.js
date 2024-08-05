@@ -38,6 +38,7 @@ eventEmmitter.on("forgot-password", async (payload) => {
         const notify = new Notification(payload.email, subject, mailBody);
         const { success } = await notify.via('viaEmail');
         console.log(payload.resetLink);
+        console.log(success);
         if (success) {
                 eventEmmitter.emit('complete-email');
             }

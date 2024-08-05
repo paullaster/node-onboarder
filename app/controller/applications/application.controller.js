@@ -352,7 +352,7 @@ export class ApplicationController {
                         return res.ApiResponse.error(500, "Error while accepting", error);
                     }
                 }
-                await bcInstance.OnboardApplication(payload);
+                await bcInstance.OnboardApplication(payload, params);
             });
         } catch (error) {
             return res.ApiResponse.error(500, "Error while accepting batch applications: " + error.message);
