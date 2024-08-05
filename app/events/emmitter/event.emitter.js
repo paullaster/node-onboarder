@@ -1,9 +1,9 @@
 import { EventEmitter } from "events";
 const eventEmmitter = new EventEmitter();
 
-setInterval(() => {
-    eventEmmitter.emit("syncBC");
-}, 300000);
+// setInterval(() => {
+//     eventEmmitter.emit("syncBC");
+// }, 1000);
 
 setTimeout(() => {
     eventEmmitter.emit("unsync");
