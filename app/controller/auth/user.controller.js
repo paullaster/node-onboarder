@@ -37,6 +37,7 @@ export class UserController {
                     email: user['dataValues'].email, 
                      name: user['dataValues'].name, 
                      role: user['dataValues'].role,
+                     title: user['dataValues'].title,
                      categoriesFilter: user['dataValues'].categoriesFilter,
                      countiesFilter: user['dataValues'].countiesFilter,
                      consoltium: user['dataValues'].consoltium,
