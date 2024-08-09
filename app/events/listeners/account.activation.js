@@ -15,7 +15,7 @@ eventEmmitter.on("activate-account", async (payload) => {
                  Your <strong>AHP</strong> account activation link is  ready! click <a href="${payload.resetLink}">here</a>.
                 </p>
                 <p style="margin: 0">
-                 Click the link to activate your consoltium portal.
+                 Click the link to activate your consortium portal.
                 </p>
                 <p>
                   Best regards,
