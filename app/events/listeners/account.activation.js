@@ -28,19 +28,19 @@ eventEmmitter.on("activate-account", async (payload) => {
                 </footer>
     `;
         const notify = new Notification(payload.email, subject, mailBody);
-        notify.via('viaEmail').then((success) => {
+        notify.via('viaEmail').then(({success}) => {
             User.findOne({ where: { email: payload.email } }).then(async (getUser) => {
                 if (success) {
                     if (getUser) {
                         await getUser.update({ emailed: true });
-                        eventEmmitter.emit('complete-email');
                     }
+                    return eventEmmitter.emit('complete-email');
                 }
                 else {
                     if (getUser) {
                         await getUser.destroy();
                     }
-                    eventEmmitter.emit('email-failed');
+                    return eventEmmitter.emit('email-failed');
                 }
             });
         });
