@@ -18,6 +18,8 @@ appRouter.get('/application/:id', validateUserToken, new ApplicationsController(
 appRouter.post('/application/push', new ApplicationController().pushApplication);
 appRouter.post('/accept/application', validateUserToken, new ApplicationController().acceptApplication);
 appRouter.post('/batch/accept/applications', validateUserToken, new ApplicationController().acceptBatchApplications);
+appRouter.post('/peer/review/application', validateUserToken, new ApplicationController().peerReviewApplication);
+appRouter.post('/batch/peer/review/applications', validateUserToken, new ApplicationController().batchPeerReviewApplications);
 // AUTH
 appRouter.use('/auth', userRoutes);
 

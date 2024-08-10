@@ -29,6 +29,9 @@ export class ApplicationController {
         this.persistApplication = this.persistApplication.bind(this);
         this.pushApplication = this.pushApplication.bind(this);
         this.acceptApplication = this.acceptApplication.bind(this);
+        this.peerReviewApplication = this.peerReviewApplication.bind(this);
+        this.acceptBatchApplications = this.acceptBatchApplications.bind(this);
+        this.batchPeerReviewApplications = this.batchPeerReviewApplications.bind(this);
     }
     async application(req, res) {
         try {
@@ -356,6 +359,66 @@ export class ApplicationController {
             });
         } catch (error) {
             return res.ApiResponse.error(500, "Error while accepting batch applications: " + error.message);
+        }
+    }
+    async peerReviewApplication(req, res) {
+        try {
+            if (!req.body) {
+                return res.ApiResponse.error(500, "Error while reviewing this application",);
+            }
+            const bcPayload = {
+                ...req.body,
+                consortia: req.user.consoltium
+            };
+            const params = {
+                company: 'CRONUS International Ltd.',
+            };
+            const transport = new NTLMSERVICE('AHPRecruitmentManager_PeerReviewApplication', true);
+            const bcInstance = new BCController(transport);
+            const { success, data: application, error } = await bcInstance.OnboardApplication(bcPayload, params);
+            if (success) {
+                return res.ApiResponse.success(application, 200, "Peer review was successful");
+            } else {
+                return res.ApiResponse.error(514, "Error while reviewing application:  " + error);
+            }
+        } catch (error) {
+            console.log(error);
+            return res.ApiResponse.error(500, "Error while reviewing application: " + error.message);
+        }
+    }
+    async batchPeerReviewApplications(req, res) {
+        try {
+            if (!req.body) {
+                return res.ApiResponse.error(500, "Error while reviewing batch applications",);
+            }
+
+            const params = {
+                company: 'CRONUS International Ltd.',
+            };
+            if (!Array.isArray(req.body)) {
+                return res.ApiResponse.error(400, "Expected array payload!");
+            }
+            const transport = new NTLMSERVICE('AHPRecruitmentManager_PeerReviewApplication', true);
+            const bcInstance = new BCController(transport);
+            const len = req.body?.length;
+            const consortia = req.user.consoltium;
+            req.body.forEach(async (app, index) => {
+                const payload = {
+                    no: app,
+                    consortia,
+                };
+                if (len - index === 1) {
+                    const { success, data: applications, error } = await bcInstance.OnboardApplication(payload, params);
+                    if (success) {
+                        return res.ApiResponse.success(applications, 200, "Applications peer reviewed successfully");
+                    } else {
+                        return res.ApiResponse.error(500, "Error while reviewing", error);
+                    }
+                }
+                await bcInstance.OnboardApplication(payload, params);
+            });
+        } catch (error) {
+            return res.ApiResponse.error(500, "Error while reviewing batch applications: " + error.message);
         }
     }
 }
