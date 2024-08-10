@@ -7,7 +7,7 @@ export class Notification {
         this.body = body;
         this.via = this.via.bind(this);
     }
-    async via(channel) {
+    via(channel) {
         try {
             const mailable = {
                 email: this.email,
@@ -16,13 +16,19 @@ export class Notification {
             }
             switch(channel) {
                 case 'viaEmail':
-                    return await new EmailNotification().send(mailable);
+                    return new EmailNotification().send(mailable).then(({success, data, error}) => {
+                        if (success) {
+                            return Promise.resolve({success, data});
+                        }else{
+                            return Promise.reject({success, error});
+                        }
+                    });
                 case 'viaSms':
                     return;
     
             }
         } catch (error) {
-            return { success: false, error: error.message };
+            return Promise.reject({ success: false, error: error.message });
         }
     }
 }

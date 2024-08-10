@@ -31,16 +31,16 @@ eventEmmitter.on("activate-account", async (payload) => {
         notify.via('viaEmail').then(({success}) => {
             User.findOne({ where: { email: payload.email } }).then(async (getUser) => {
                 if (success) {
+                    eventEmmitter.emit('complete-email');
                     if (getUser) {
-                        await getUser.update({ emailed: true });
+                        return await getUser.update({ emailed: true });
                     }
-                    return eventEmmitter.emit('complete-email');
                 }
                 else {
+                    eventEmmitter.emit('email-failed');
                     if (getUser) {
-                        await getUser.destroy();
+                        return await getUser.destroy();
                     }
-                    return eventEmmitter.emit('email-failed');
                 }
             });
         });
