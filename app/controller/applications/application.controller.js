@@ -32,6 +32,8 @@ export class ApplicationController {
         this.peerReviewApplication = this.peerReviewApplication.bind(this);
         this.acceptBatchApplications = this.acceptBatchApplications.bind(this);
         this.batchPeerReviewApplications = this.batchPeerReviewApplications.bind(this);
+        this.reverseOnboardedApplication = this.reverseOnboardedApplication.bind(this);
+        this.batchReverseOnboardedApplications = this.batchReverseOnboardedApplications.bind(this);
         this.uploadAttachments = this.uploadAttachments.bind(this);
     }
     async application(req, res) {
@@ -415,6 +417,65 @@ export class ApplicationController {
         }
     }
 
+    async reverseOnboardedApplication(req, res) {
+        try {
+            if (!req.body) {
+                return res.ApiResponse.error(500, "Error while reversing this application",);
+            }
+            const bcPayload = {
+                ...req.body,
+                consortia: req.user.consoltium
+            };
+            const params = {
+                company: 'CRONUS International Ltd.',
+            };
+            const transport = new NTLMSERVICE('AHPRecruitmentManager_ReopenOnboardedApplication', true);
+            const bcInstance = new BCController(transport);
+            const { success, data: application, error } = await bcInstance.OnboardApplication(bcPayload, params);
+            if (success) {
+                return res.ApiResponse.success(application, 200, "Application reversed successfully");
+            } else {
+                return res.ApiResponse.error(514, "Error while reversing application:  " + error);
+            }
+        } catch (error) {
+            return res.ApiResponse.error(500, "Error while reversing this application: " + error.message);
+        }
+    }
+    async batchReverseOnboardedApplications(req, res) {
+        try {
+            if (!req.body) {
+                return res.ApiResponse.error(500, "Error while reversing batch applications",);
+            }
+
+            const params = {
+                company: 'CRONUS International Ltd.',
+            };
+            if (!Array.isArray(req.body)) {
+                return res.ApiResponse.error(400, "Expected array payload!");
+            }
+            const transport = new NTLMSERVICE('AHPRecruitmentManager_ReopenOnboardedApplication', true);
+            const bcInstance = new BCController(transport);
+            const len = req.body?.length;
+            const consortia = req.user.consoltium;
+            req.body.forEach(async (app, index) => {
+                const payload = {
+                    no: app,
+                    consortia,
+                };
+                if (len - index === 1) {
+                    const { success, data: applications, error } = await bcInstance.OnboardApplication(payload, params);
+                    if (success) {
+                        return res.ApiResponse.success(applications, 200, "Applications were reversed successfully");
+                    } else {
+                        return res.ApiResponse.error(500, "Error while reversing", error);
+                    }
+                }
+                await bcInstance.OnboardApplication(payload, params);
+            });
+        } catch (error) {
+            return res.ApiResponse.error(500, "Error while reversing batch applications: " + error.message);
+        }
+    }
     async uploadAttachments(req, res) {
         try {
 
@@ -422,7 +483,7 @@ export class ApplicationController {
             console.log(getAttachments);
             console.log(req.files);
         } catch (error) {
-
+            return res.ApiResponse.error(500, "Error while reviewing batch applications: " + error.message);
         }
     }
 

@@ -19,7 +19,9 @@ appRouter.post('/accept/application', validateUserToken, new ApplicationControll
 appRouter.post('/batch/accept/applications', validateUserToken, new ApplicationController().acceptBatchApplications);
 appRouter.post('/peer/review/application', validateUserToken, new ApplicationController().peerReviewApplication);
 appRouter.post('/batch/peer/review/applications', validateUserToken, new ApplicationController().batchPeerReviewApplications);
-appRouter.post('/recover/attachments',  new ApplicationController().uploadAttachments)
+appRouter.post('/reverse/onboarded/application', validateUserToken, new ApplicationController().reverseOnboardedApplication);
+appRouter.post('/batch/reverse/onboarded/applications', validateUserToken, new ApplicationController().batchReverseOnboardedApplications);
+appRouter.post('/recover/attachments',  new ApplicationController().uploadAttachments);
 // AUTH
 appRouter.use('/auth', userRoutes);
 
