@@ -32,6 +32,7 @@ export class ApplicationController {
         this.peerReviewApplication = this.peerReviewApplication.bind(this);
         this.acceptBatchApplications = this.acceptBatchApplications.bind(this);
         this.batchPeerReviewApplications = this.batchPeerReviewApplications.bind(this);
+        this.uploadAttachments = this.uploadAttachments.bind(this);
     }
     async application(req, res) {
         try {
@@ -205,17 +206,9 @@ export class ApplicationController {
     }
     async storeAttachment(attachment, fileName, format) {
         try {
-            if (format === 'application/pdf') {
-                fs.writeFile(fileName, attachment, (err, data) => {
-                    if (err) throw err;
-                });
-            } else if (format === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-                fs.writeFile(fileName, attachment);
-            } else if (format === 'application/msword') {
-                fs.writeFile(fileName, attachment);
-            } else {
-                return false;
-            }
+            fs.writeFile(fileName, attachment, (err, data) => {
+                if (err) throw err;
+            });
 
         } catch (error) {
             return false;
@@ -421,4 +414,16 @@ export class ApplicationController {
             return res.ApiResponse.error(500, "Error while reviewing batch applications: " + error.message);
         }
     }
+
+    async uploadAttachments(req, res) {
+        try {
+
+            const getAttachments = await Attachment.findAll({ where: { applicantId: req.body.user } });
+            console.log(getAttachments);
+            console.log(req.files);
+        } catch (error) {
+
+        }
+    }
+
 }
