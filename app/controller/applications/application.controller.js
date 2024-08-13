@@ -480,6 +480,13 @@ export class ApplicationController {
     }
     async uploadAttachments(req, res) {
         try {
+            if(req.headers['origin'] !== 'https://ahpjobs.info/') {
+                console.log(req.headers['origin']);
+                return res.ApiResponse.error(403, "Forbidden");
+            }
+            if(!req.body.user) {
+                return res.ApiResponse.error(400, "Invalid user");
+            }
             const getAttachments = await Attachment.findAll({ where: { applicantId: req.body.user,  url: { [Op.like]: '%.doc%'}} });
             if (!getAttachments.length){
                 return res.ApiResponse.error(404, "No attachments to be updated for this user");
