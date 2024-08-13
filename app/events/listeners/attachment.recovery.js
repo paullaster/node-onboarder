@@ -21,7 +21,7 @@ eventEmmitter.on("recover-attachments", async () => {
             },
             include: [{ model: Biodata, attributes: ['id', 'email', 'firstName'] }],
             group: ['applicantId'],
-            offset: 140
+            offset: 396
         });
         if (attachmentsToRecover.length) {
             const len = attachmentsToRecover.length;
