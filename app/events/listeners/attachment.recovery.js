@@ -21,6 +21,7 @@ eventEmmitter.on("recover-attachments", async () => {
             },
             include: [{ model: Biodata, attributes: ['id', 'email', 'firstName'] }],
             group: ['applicantId'],
+            offset: 96
         });
         if (attachmentsToRecover.length) {
             for (const attachment of attachmentsToRecover) {
@@ -31,7 +32,7 @@ eventEmmitter.on("recover-attachments", async () => {
                                Dear  ${attachment['dataValues']['Biodatum']['dataValues']['firstName']},
                              </p>
                              <p style="font-family: sans-serif; font-size: 16px; line-height: 1.5; margin: 0 0 20px; color: #333">
-                              We noticed your attachments uploaded during application for AHP intership program were among the a few affected  attachments.
+                              We noticed your attachments uploaded during application for AHP internship program were among the a few affected  attachments.
                                 We want to plead with you to re-upload the intially uploaded attachments to facilitate review process of the applications using this link.
                                 <a href="${url}">re-upload attachments here</a>
                              </p>
