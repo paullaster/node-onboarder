@@ -9,5 +9,5 @@ setTimeout(() => {
     // eventEmmitter.emit("unsync");
     eventEmmitter.emit("recover-attachments");
 
-},60000)
+},3600000)
 export default eventEmmitter;

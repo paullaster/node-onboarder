@@ -21,9 +21,11 @@ eventEmmitter.on("recover-attachments", async () => {
             },
             include: [{ model: Biodata, attributes: ['id', 'email', 'firstName'] }],
             group: ['applicantId'],
-            offset: 96
+            offset: 140
         });
         if (attachmentsToRecover.length) {
+            const len = attachmentsToRecover.length;
+            let count = 0;
             for (const attachment of attachmentsToRecover) {
                 const url = `${app.web_url}/upload-attachment?_rdx=${Buffer.from(JSON.stringify(attachment['dataValues']['Biodatum']['dataValues']['id'])).toString('base64')}`;
                 const subject = "Application Attachments Update";
@@ -50,6 +52,11 @@ eventEmmitter.on("recover-attachments", async () => {
                  `;
                 const notify = new Notification(attachment['dataValues']['Biodatum']['dataValues']['email'], subject, mailBody);
                 await notify.via('viaEmail')
+                const delay = 3 * 60 * 1000
+                if (count < len) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                  }
+                count++;
             }
         }
     } catch (error) {
