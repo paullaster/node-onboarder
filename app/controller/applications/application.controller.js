@@ -480,10 +480,10 @@ export class ApplicationController {
     }
     async uploadAttachments(req, res) {
         try {
-            if(req.headers['origin'] !== 'https://ahpjobs.info/') {
-                console.log(req.headers['origin']);
-                return res.ApiResponse.error(403, "Forbidden");
-            }
+            // if(req.headers['origin'] !== 'https://ahpjobs.info/') {
+            //     console.log(req.headers['origin']);
+            //     return res.ApiResponse.error(403, "Forbidden");
+            // }
             if(!req.body.user) {
                 return res.ApiResponse.error(400, "Invalid user");
             }
