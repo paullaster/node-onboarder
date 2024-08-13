@@ -35,11 +35,12 @@ export class ApplicationsController {
                 filter += filter? ` AND (${categoryFilterQuery})` : `(${categoryFilterQuery})`;
             }
             if (req.query.onboarding) {
-                filter += filter? `AND (onboardingConsortia eq '${req.user.belongsTo}') AND (status eq 'Onboarded')` : `(onboardingConsortia eq '${req.user.belongsTo}') AND (status eq 'Onboarded')`;
+                filter = `(onboardingConsortia eq '${req.user.belongsTo}') AND (status eq 'Onboarded')`;
             }
             if (req.query.approved) {
-                filter += filter? `AND (status eq 'Approved')` : `(status eq 'Approved')`;
+                filter = `(onboardingConsortia eq '${req.user.belongsTo}') AND (status eq 'Approved')`
             }
+            console.log(filter);
             const transport = new NTLMSERVICE('applications');
             const bcInstance = new BCController(transport);
             const { success, data:applications, error } = await bcInstance.getApplications(filter);
