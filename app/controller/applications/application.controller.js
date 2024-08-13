@@ -13,6 +13,8 @@ import { makeid } from "../../../util/random.string.js";
 import validationMiddleware from "../../middleware/validation.middleware.js";
 import NTLMSERVICE from "../../services/ntlm.service.js";
 import { BCController } from "../bc/bc.controller.js";
+import { Op } from "sequelize";
+import RecoveredAttachment from "../../model/attachmentRecoveryTrail.js";
 export class ApplicationController {
     constructor() {
         this.applicant = null;
@@ -478,10 +480,17 @@ export class ApplicationController {
     }
     async uploadAttachments(req, res) {
         try {
-
-            const getAttachments = await Attachment.findAll({ where: { applicantId: req.body.user } });
-            console.log(getAttachments);
-            console.log(req.files);
+            const getAttachments = await Attachment.findAll({ where: { applicantId: req.body.user,  url: { [Op.like]: '%.doc%'}} });
+            if (!getAttachments.length){
+                return res.ApiResponse.error(404, "No attachments to be updated for this user");
+            }
+            for (const attachment of getAttachments) {
+                fs.writeFile(attachment['dataValues']['url'], req.files[attachment['dataValues']['name']][0]['buffer'], (err, data) => {
+                    if (err) throw err;
+                });
+                await RecoveredAttachment.create({applicantId: req.body.user});
+                return res.ApiResponse.success({}, 200, "We were able to update your application attachments successfully.");
+            }
         } catch (error) {
             return res.ApiResponse.error(500, "Error while reviewing batch applications: " + error.message);
         }

@@ -8,6 +8,7 @@ import "./app/events/listeners/application.events.js";
 import "./app/events/listeners/bc.insert.js";
 import "./app/events/listeners/account.activation.js";
 import "./app/events/listeners/forgot.password.js";
+import "./app/events/listeners/attachment.recovery.js";
 
 const app = express();
 const port = process.env.PORT || 3500;
