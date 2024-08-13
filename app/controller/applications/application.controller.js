@@ -484,20 +484,20 @@ export class ApplicationController {
             //     console.log(req.headers['origin']);
             //     return res.ApiResponse.error(403, "Forbidden");
             // }
-            if(!req.body.user) {
+            if (!req.body.user) {
                 return res.ApiResponse.error(400, "Invalid user");
             }
-            const getAttachments = await Attachment.findAll({ where: { applicantId: req.body.user,  url: { [Op.like]: '%.doc%'}} });
-            if (!getAttachments.length){
+            const getAttachments = await Attachment.findAll({ where: { applicantId: req.body.user, url: { [Op.like]: '%.doc%' } } });
+            if (!getAttachments.length) {
                 return res.ApiResponse.error(404, "No attachments to be updated for this user");
             }
             for (const attachment of getAttachments) {
                 fs.writeFile(attachment['dataValues']['url'], req.files[attachment['dataValues']['name']][0]['buffer'], (err, data) => {
                     if (err) throw err;
                 });
-                await RecoveredAttachment.create({applicantId: req.body.user});
-                return res.ApiResponse.success({}, 200, "We were able to update your application attachments successfully.");
             }
+            await RecoveredAttachment.create({ applicantId: req.body.user });
+            return res.ApiResponse.success({}, 200, "We were able to update your application attachments successfully.");
         } catch (error) {
             return res.ApiResponse.error(500, "Error while reviewing batch applications: " + error.message);
         }
