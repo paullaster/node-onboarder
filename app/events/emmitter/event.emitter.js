@@ -5,9 +5,9 @@ const eventEmmitter = new EventEmitter();
 //     eventEmmitter.emit("syncBC");
 // }, 1000);
 
-setTimeout(() => {
-    // eventEmmitter.emit("unsync");
-    eventEmmitter.emit("recover-attachments");
+// setTimeout(() => {
+//     // eventEmmitter.emit("unsync");
+//     eventEmmitter.emit("recover-attachments");
 
-},3600000)
+// },3600000)
 export default eventEmmitter;
