@@ -16,7 +16,7 @@ const appRouter = express.Router();
 
 
 // APPLICATIONS
-appRouter.post('/application', new ApplicationController().application);
+// appRouter.post('/application', new ApplicationController().application);
 appRouter.get('/applications', validateUserToken, new ApplicationsController().applications);
 appRouter.get('/application/:id', validateUserToken, new ApplicationsController().application);
 appRouter.post('/application/push', new ApplicationController().pushApplication);
