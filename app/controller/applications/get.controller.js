@@ -32,7 +32,7 @@ export class ApplicationsController {
                 filter += `(${countyFilterQuery})`;
             }
             if (categoryFilterQuery) {
-                filter += filter? ` AND (${categoryFilterQuery})` : `(${categoryFilterQuery})`;
+                filter += filter? ` AND (${categoryFilterQuery}) AND (status eq 'New')` : `(${categoryFilterQuery}) AND (status eq 'New')`;
             }
             if (req.query.onboarding) {
                 filter = `(onboardingConsortia eq '${req.user.belongsTo}') AND (status eq 'Onboarded')`;
