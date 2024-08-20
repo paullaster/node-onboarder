@@ -37,6 +37,8 @@ export class ApplicationController {
         this.reverseOnboardedApplication = this.reverseOnboardedApplication.bind(this);
         this.batchReverseOnboardedApplications = this.batchReverseOnboardedApplications.bind(this);
         this.uploadAttachments = this.uploadAttachments.bind(this);
+        this.hrReviewApplication = this.hrReviewApplication.bind(this);
+        this.batchHrReviewApplication = this.batchHrReviewApplication.bind(this);
     }
     async application(req, res) {
         try {
@@ -443,6 +445,30 @@ export class ApplicationController {
             return res.ApiResponse.error(500, "Error while reversing this application: " + error.message);
         }
     }
+    async hrReviewApplication(req, res) {
+        try {
+            if (!req.body) {
+                return res.ApiResponse.error(500, "Error while perfomring this action",);
+            }
+            const bcPayload = {
+                ...req.body,
+                hr: req.user.consoltium
+            };
+            const params = {
+                company: 'CRONUS International Ltd.',
+            };
+            const transport = new NTLMSERVICE('AHPRecruitmentManager_HRReviewApplication', true);
+            const bcInstance = new BCController(transport);
+            const { success, data: application, error } = await bcInstance.OnboardApplication(bcPayload, params);
+            if (success) {
+                return res.ApiResponse.success(application, 200, "Action successful");
+            } else {
+                return res.ApiResponse.error(514, "Error while perfomring this action:  " + error);
+            }
+        } catch (error) {
+            return res.ApiResponse.error(500, "error while perfomring this action: " + error.message);
+        }
+    }
     async batchReverseOnboardedApplications(req, res) {
         try {
             if (!req.body) {
@@ -478,12 +504,43 @@ export class ApplicationController {
             return res.ApiResponse.error(500, "Error while reversing batch applications: " + error.message);
         }
     }
+    async batchHrReviewApplication(req, res) {
+        try {
+            if (!req.body) {
+                return res.ApiResponse.error(500, "Error while perfomring this action",);
+            }
+
+            const params = {
+                company: 'CRONUS International Ltd.',
+            };
+            if (!Array.isArray(req.body)) {
+                return res.ApiResponse.error(400, "Expected array payload!");
+            }
+            const transport = new NTLMSERVICE('AHPRecruitmentManager_HRReviewApplication', true);
+            const bcInstance = new BCController(transport);
+            const len = req.body?.length;
+            const hr = req.user.consoltium;
+            req.body.forEach(async (app, index) => {
+                const payload = {
+                    no: app,
+                    hr,
+                };
+                if (len - index === 1) {
+                    const { success, data: applications, error } = await bcInstance.OnboardApplication(payload, params);
+                    if (success) {
+                        return res.ApiResponse.success(applications, 200, "Action successful");
+                    } else {
+                        return res.ApiResponse.error(500, "Error while performing this action", error);
+                    }
+                }
+                await bcInstance.OnboardApplication(payload, params);
+            });
+        } catch (error) {
+            return res.ApiResponse.error(500, "Error perfoming batch action: " + error.message);
+        }
+    }
     async uploadAttachments(req, res) {
         try {
-            // if(req.headers['origin'] !== 'https://ahpjobs.info/') {
-            //     console.log(req.headers['origin']);
-            //     return res.ApiResponse.error(403, "Forbidden");
-            // }
             if (!req.body.user) {
                 return res.ApiResponse.error(400, "Invalid user");
             }

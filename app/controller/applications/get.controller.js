@@ -31,14 +31,26 @@ export class ApplicationsController {
             if (countyFilterQuery) {
                 filter += `(${countyFilterQuery})`;
             }
-            if (categoryFilterQuery) {
+            if (categoryFilterQuery  && req.user.role.toLowerCase() === 'hr' && !req.query.approved && !req.query.onboarding && !req.query.hrReviewed) {
+                filter += filter? ` AND (status eq 'New')` : `AND (status eq 'New')`;
+            }
+            if (categoryFilterQuery  && req.user.role.toLowerCase() !== 'hr') {
                 filter += filter? ` AND (${categoryFilterQuery}) AND (status eq 'New')` : `(${categoryFilterQuery}) AND (status eq 'New')`;
             }
-            if (req.query.onboarding) {
+            if (req.query.onboarding  && req.user.role.toLowerCase() === 'hr') {
+                filter += filter? ` AND (status eq 'Onboarded')` : `AND (status eq 'Onboarded')`;
+            }
+            if (req.query.onboarding && req.user.role.toLowerCase() !== 'hr') {
                 filter = `(onboardingConsortia eq '${req.user.belongsTo}') AND (status eq 'Onboarded')`;
             }
-            if (req.query.approved) {
+            if (req.query.approved  && req.user.role.toLowerCase() === 'hr') {
+                filter += filter? ` AND (status eq 'Approved')` : `AND (status eq 'Approved')`;
+            }
+            if (req.query.approved && req.user.role.toLowerCase() !== 'hr') {
                 filter = `(onboardingConsortia eq '${req.user.belongsTo}') AND (status eq 'Approved')`
+            }
+            if (req.query.hrReviewed && req.user.role.toLowerCase() === 'hr') {
+                filter = filter? `AND (status eq 'Reviewed')` : `(status eq 'Reviewed')`
             }
             console.log(filter);
             const transport = new NTLMSERVICE('applications');

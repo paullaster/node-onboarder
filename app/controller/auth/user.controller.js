@@ -66,7 +66,7 @@ export class UserController {
                 email: user.eMail,
                 name: user.name,
                 phone: user.phone,
-                role: user.lead ? 'lead' : 'user',
+                role: user.lead ? 'lead' :  user.type === 'HR' ? 'hr' : 'user',
                 consoltium: user.no,
                 active: false,
                 belongsTo: user.belongsTo ?? null,
@@ -85,13 +85,7 @@ export class UserController {
             };
             const userToken = await Token.create(data);
             const resetLink = `${app.web_url}/auth/set-password/${userToken.key}`;
-            eventEmmitter.emit('activate-account', {email, name, resetLink});
-            // eventEmmitter.on('complete-email', ()=> {
-            //     return res.ApiResponse.success({  }, 200, "Account activation link ahs been sent to your email.");
-            // });
-            // eventEmmitter.on('email-failed', ()=> {
-            //     return res.ApiResponse.error(500, "Failed to send email, please try again later.");
-            // });
+            eventEmmitter.emit('activate-account', {email, name, resetLink, type: user.type});
             return res.ApiResponse.success({  }, 200, "Account activation link has been sent to your email.");
         } catch (error) {
             return res.ApiResponse.error(500, "Error while activating you account:  " + error.message);
@@ -112,12 +106,6 @@ export class UserController {
             const userToken = await Token.create(data);
             const resetLink = `${app.web_url}/auth/set-password/${userToken.key}`;
             eventEmmitter.emit('forgot-password', {email: user['dataValues'].email, resetLink});
-            // eventEmmitter.on('complete-email', ()=> {
-            //     return res.ApiResponse.success({  }, 200, "Reset password link has been sent to your email.");
-            // });
-            // eventEmmitter.on('email-failed', ()=> {
-            //     return res.ApiResponse.error(500, "Failed to send email, please try again later.");
-            // });
             return res.ApiResponse.success({  }, 200, "Reset password link has been sent to your email.");
         } catch (error) {
             return res.ApiResponse.error(500, "Error while sending forgot password email:  " + error.message);

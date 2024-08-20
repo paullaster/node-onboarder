@@ -26,6 +26,8 @@ appRouter.post('/peer/review/application', validateUserToken, new ApplicationCon
 appRouter.post('/batch/peer/review/applications', validateUserToken, new ApplicationController().batchPeerReviewApplications);
 appRouter.post('/reverse/onboarded/application', validateUserToken, new ApplicationController().reverseOnboardedApplication);
 appRouter.post('/batch/reverse/onboarded/applications', validateUserToken, new ApplicationController().batchReverseOnboardedApplications);
+appRouter.post('/batch/hr/review/applications', validateUserToken, new ApplicationController().batchHrReviewApplication);
+appRouter.post('/hr/review/application', validateUserToken, new ApplicationController().hrReviewApplication);
 appRouter.post('/recover/attachments', upload.fields([
     {
         name: 'coverLetter',

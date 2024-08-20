@@ -6,7 +6,7 @@ import User from "../../model/user.js";
 eventEmmitter.on("activate-account", async (payload) => {
     try {
         console.log("activate-account emmitted");
-        const subject = "Consortium Account Activation";
+        const subject = payload.type.toLowerCase() === 'hr' ? `HR Account Activation` : `Consortium Account Activation`;
         const mailBody = `
                   <p style="font-family: sans-serif; font-size: 16px; line-height: 1.5; margin: 0 0 20px; color: #333">
                   Dear  ${payload.name},
@@ -15,7 +15,7 @@ eventEmmitter.on("activate-account", async (payload) => {
                  Your <strong>AHP</strong> account activation link is  ready! click <a href="${payload.resetLink}">here</a>.
                 </p>
                 <p style="margin: 0">
-                 Click the link to activate your consortium portal.
+                 Click the link to activate your AHP account!.
                 </p>
                 <p>
                   Best regards,
