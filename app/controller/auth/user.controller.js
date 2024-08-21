@@ -40,6 +40,8 @@ export class UserController {
                      title: user['dataValues'].title,
                      categoriesFilter: user['dataValues'].categoriesFilter,
                      countiesFilter: user['dataValues'].countiesFilter,
+                     consortiaFilter: user['dataValues'].categoriesFilter,
+                     isAdmin: user['dataValues'].isAdmin,
                      consoltium: user['dataValues'].consoltium,
                      belongsTo: user['dataValues'].belongsTo
                 }, app.key, { algorithm: 'HS512', expiresIn: '10h' });
@@ -71,8 +73,9 @@ export class UserController {
                 active: false,
                 belongsTo: user.belongsTo ?? null,
                 title: user.title ?? null,
-                categoriesFilter: user.categoriesFilter,
-                countiesFilter: user.countiesFilter
+                categoriesFilter: user.type.toLowerCase() === 'hr' ? user.consortiaFilter : user.categoriesFilter,
+                countiesFilter: user.countiesFilter,
+                // consortiaFilter: user.consortiaFilter,
             };
             const createdUser = await User.create(newUser);
             if (!createdUser) return res.ApiResponse.error(409, "Sorry!, We ran into an error while activating the user");

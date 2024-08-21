@@ -71,6 +71,11 @@ const User = sequelize.define('User',{
         allowNull: true,
         unique: false,
     },
+    // consortiaFilter: {
+    //     type: DataTypes.TEXT,
+    //     allowNull: true,
+    //     unique: false,
+    // },
     isAdmin: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
