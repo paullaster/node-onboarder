@@ -5,6 +5,7 @@ import { setupRoutes } from './routes/setup.routes.js';
 import { userRoutes } from './routes/user.routes.js';
 import { validateUserToken } from './app/middleware/verify.user.token.js';
 import multer, { memoryStorage } from 'multer';
+import { feedbackRoutes } from './routes/feedback.routes.js';
 
 
 // CREATE FILES MEMORY STORAGE WITH MULTER
@@ -42,6 +43,7 @@ appRouter.post('/recover/attachments', upload.fields([
   new ApplicationController().uploadAttachments);
 // AUTH
 appRouter.use('/auth', userRoutes);
+appRouter.use('/feedback', feedbackRoutes);
 
 
 // SETUP ROUTES

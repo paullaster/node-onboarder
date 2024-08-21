@@ -5,6 +5,8 @@ export class BCController {
         this.getSetups = this.getSetups.bind(this);
         this.OnboardApplication = this.OnboardApplication.bind(this);
         this.getConsoltium = this.getConsoltium.bind(this);
+        this.leaveFeedback = this.leaveFeedback.bind(this);
+        this.getFeedbackHistory = this.getFeedbackHistory.bind(this);
     }
 
     async postapplicant(applicant) {
@@ -21,20 +23,28 @@ export class BCController {
 
     async getSetups(req, res) {
         try {
-            const data = await this.traport.request();
+            console.log(req.query)
+            const data = await this.traport.request({}, 'GET', req.query);
             return res.ApiResponse.success(data, 200, );
         } catch (error) {
             return res.ApiResponse.error(error.message);
         }
     }
 
-    async getApplications(filters) {
+    async getApplications(filters, ...args) {
         try {
-            const filter = {
+            let query = {
                 "$filter": filters,
                 "$expand": "*",
+                $count: true,
             };
-            const { success, data, error } = await this.traport.request({}, 'GET', filter);
+            for (const it of args) {
+                query = {
+                    ...query,
+                    ...it,
+                }
+            }
+            const { success, data, error } = await this.traport.request({}, 'GET', query);
             if (success) {
                 return { success, data };
             }
@@ -78,6 +88,28 @@ export class BCController {
                 return { success, data };
             }
             return {success, error };
+        } catch (error) {
+            return {success: false, error: error.message};
+        }
+    }
+    async leaveFeedback(feedback) {
+        try {
+            const { success, data, error } = await this.traport.request(feedback, 'POST');
+            if (success) {
+                return { success, data };
+            }
+            return {success, error };
+        } catch (error) {
+            return {success: false, error: error.message};
+        }
+    }
+    async getFeedbackHistory(query) {
+        try {
+            const { success, data, error } = await this.traport.request({}, 'GET', query);
+            if (success) {
+                return { success, data };
+            }
+            return { success, error };
         } catch (error) {
             return {success: false, error: error.message};
         }

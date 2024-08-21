@@ -50,12 +50,17 @@ export class ApplicationsController {
                 filter = `(onboardingConsortia eq '${req.user.belongsTo}') AND (status eq 'Approved')`
             }
             if (req.query.hrReviewed && req.user.role.toLowerCase() === 'hr') {
-                filter = filter? `AND (status eq 'Reviewed')` : `(status eq 'Reviewed')`
+                filter += filter? ` AND (status eq 'Reviewed')` : `(status eq 'Reviewed')`
             }
             console.log(filter);
             const transport = new NTLMSERVICE('applications');
             const bcInstance = new BCController(transport);
-            const { success, data:applications, error } = await bcInstance.getApplications(filter);
+            for (const q in req?.query) {
+                if (!q.startsWith('$')){
+                    delete req.query[q];
+                }
+            }
+            const { success, data:applications, error } = await bcInstance.getApplications(filter, req.query);
             if (success) {
                 return res.ApiResponse.success(applications);
             }else {
