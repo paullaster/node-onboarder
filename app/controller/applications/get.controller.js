@@ -13,7 +13,7 @@ export class ApplicationsController {
             const countiesFilter = user['dataValues'].countiesFilter.split("|");
             let categoryFilterQuery;
             categoriesFilter.forEach((category) => {
-                const prop =  req.user.role.toLowerCase() === 'hr' ? 'approvedByConsortia' : 'category';
+                const prop =  req.user.role.toLowerCase() !== 'hr' ? 'category': req.query.onboarding ? 'onboardingConsortia' : 'approvedByConsortia'  ;
                 if (!categoryFilterQuery) {
                     categoryFilterQuery = ` ${prop} eq '${category}'`;
                 }else {
