@@ -50,7 +50,7 @@ export class ApplicationsController {
                 filter = `(onboardingConsortia eq '${req.user.belongsTo}') AND (status eq 'Approved')`
             }
             if (req.query.hrReviewed && req.user.role.toLowerCase() === 'hr') {
-                filter += filter? ` AND (status eq 'Reviewed')` : `(status eq 'Reviewed')`
+                filter += filter? ` AND (status eq 'Reviewed') AND (hRReviewedBy eq '${req.user.consoltium}')` : `(status eq 'Reviewed') AND (hRReviewedBy eq '${req.user.consoltium}')`
             }
             if (req.query.hrReviewed && req.user.role.toLowerCase() !== 'hr') {
                 filter += filter? `AND (approvedByConsortia eq '${req.user.belongsTo}')  AND (status eq 'Reviewed')` : `(approvedByConsortia eq '${req.user.belongsTo}') AND (status eq 'Reviewed')`
