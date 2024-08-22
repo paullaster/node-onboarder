@@ -33,7 +33,7 @@ export class ApplicationsController {
                 filter += `(${countyFilterQuery})`;
             }
             if (categoryFilterQuery  && req.user.role.toLowerCase() === 'hr' && !req.query.approved && !req.query.onboarding && !req.query.hrReviewed) {
-                filter += filter? ` AND ${categoryFilterQuery} AND (status eq 'New')` : `${categoryFilterQuery} AND (status eq 'New')`;
+                filter = `(status eq 'New')`;
             }
             if (categoryFilterQuery  && req.user.role.toLowerCase() !== 'hr') {
                 filter += filter? ` AND (${categoryFilterQuery}) AND (status eq 'New')` : `(${categoryFilterQuery}) AND (status eq 'New')`;
