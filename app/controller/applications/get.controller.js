@@ -39,19 +39,19 @@ export class ApplicationsController {
                 filter += filter? ` AND (${categoryFilterQuery}) AND (status eq 'New')` : `(${categoryFilterQuery}) AND (status eq 'New')`;
             }
             if (req.query.onboarding  && req.user.role.toLowerCase() === 'hr') {
-                filter = categoryFilterQuery? ` ${categoryFilterQuery} AND (status eq 'Onboarded')` : ` (status eq 'Onboarded')`;
+                filter = categoryFilterQuery? ` (${categoryFilterQuery}) AND (status eq 'Onboarded')` : ` (status eq 'Onboarded')`;
             }
             if (req.query.onboarding && req.user.role.toLowerCase() !== 'hr') {
                 filter = `(onboardingConsortia eq '${req.user.belongsTo}') AND (status eq 'Onboarded')`;
             }
             if (req.query.approved  && req.user.role.toLowerCase() === 'hr') {
-                filter = categoryFilterQuery? `${categoryFilterQuery} AND (status eq 'Approved')` : ` (status eq 'Approved')`;
+                filter = categoryFilterQuery? `(${categoryFilterQuery}) AND (status eq 'Approved')` : ` (status eq 'Approved')`;
             }
             if (req.query.approved && req.user.role.toLowerCase() !== 'hr') {
                 filter = `(onboardingConsortia eq '${req.user.belongsTo}') AND (status eq 'Approved')`
             }
             if (req.query.hrReviewed && req.user.role.toLowerCase() === 'hr') {
-                filter = categoryFilterQuery? ` ${categoryFilterQuery} AND (status eq 'Reviewed') AND (hRReviewedBy eq '${req.user.consoltium}')` : `(status eq 'Reviewed') AND (hRReviewedBy eq '${req.user.consoltium}')`
+                filter = categoryFilterQuery? ` (${categoryFilterQuery} )AND (status eq 'Reviewed') AND (hRReviewedBy eq '${req.user.consoltium}')` : `(status eq 'Reviewed') AND (hRReviewedBy eq '${req.user.consoltium}')`
             }
             if (req.query.hrReviewed && req.user.role.toLowerCase() !== 'hr') {
                 filter = ` (approvedByConsortia eq '${req.user.belongsTo}')  AND (status eq 'Reviewed')`;
