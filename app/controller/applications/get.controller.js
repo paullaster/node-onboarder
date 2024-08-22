@@ -52,6 +52,9 @@ export class ApplicationsController {
             if (req.query.hrReviewed && req.user.role.toLowerCase() === 'hr') {
                 filter += filter? ` AND (status eq 'Reviewed')` : `(status eq 'Reviewed')`
             }
+            if (req.query.hrReviewed && req.user.role.toLowerCase() !== 'hr') {
+                filter += filter? `AND (approvedByConsortia eq '${req.user.belongsTo}')  AND (status eq 'Reviewed')` : `(approvedByConsortia eq '${req.user.belongsTo}') AND (status eq 'Reviewed')`
+            }
             console.log(filter);
             const transport = new NTLMSERVICE('applications');
             const bcInstance = new BCController(transport);
