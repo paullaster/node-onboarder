@@ -89,4 +89,38 @@ export class ApplicationsController {
             return res.ApiResponse.error(500, error.message);
         }
     }
+    async searchApplications(req, res) {
+        try {
+            if (!req.query) return res.ApiResponse.error(500, "Invalid search query");
+            let filter;
+            for (const [key, value] of Object.entries(req.query)) {
+                if (!req.query[key]) return res.ApiResponse.error(500, "Invalid search query");
+                if (key === 'county') {
+                    if (!filter) {
+                        filter = `(countyOfOrigin eq '${value}')`;
+                    } else {
+                        filter += ` AND (countyOfOrigin eq '${value}')`;
+                    }
+                }
+                if (key === 'category') {
+                    if (!filter) {
+                        filter = `(category eq '${value}')`;
+                    } else {
+                        filter += ` AND (category eq '${value}')`;
+                    }
+                }
+            }
+            const transport = new NTLMSERVICE('applications');
+            const bcInstance = new BCController(transport);
+            console.log("FILTER QUERY: ", filter)
+            const { success, data: applications, error } = await bcInstance.getApplications(filter);
+            if (success) {
+                return res.ApiResponse.success(applications);
+            } else {
+                return res.ApiResponse.error(404, error);
+            }
+        } catch (error) {
+            return res.ApiResponse.error(500, error);
+        }
+    }
 }
