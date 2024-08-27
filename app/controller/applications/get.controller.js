@@ -91,18 +91,35 @@ export class ApplicationsController {
     }
     async searchApplications(req, res) {
         try {
+            const user = await User.findByPk(req.user.id);
+            if (!user) return res.ApiResponse.error(401, "Unauthorized");
             if (!req.query) return res.ApiResponse.error(500, "Invalid search query");
+            const categoriesFilter = user['dataValues'].categoriesFilter.split("|");
+            const countiesFilter = user['dataValues'].countiesFilter.split("|");
+            let categoryFilterQuery;
+            let countiesFilterQuery;
+            categoriesFilter.forEach((category) => {
+                if (!categoryFilterQuery) {
+                    categoryFilterQuery = ` category eq '${category}'`;
+                }else {
+                    categoryFilterQuery += ` OR category eq '${category}'`;
+                }
+            });
+            countiesFilter.forEach((county) => {
+                if (!countiesFilterQuery) {
+                    countiesFilterQuery = ` countyOfOrigin eq '${county}'`;
+                }else {
+                    countiesFilterQuery += ` OR countyOfOrigin eq '${county}'`;
+                }
+            })
             let filter;
             const paginator = {};
-            console.log("uncleaned ", req.query)
             for (const [key, value] of Object.entries(req.query)) {
                 if (key.startsWith('$')) {
                     paginator[key] = value;
                     delete req.query[key];
                 }
             }
-            console.log('paginator', paginator);
-            console.log('Cleaned query', req.query);
             for (const [key, value] of Object.entries(req.query)) {
                 if (!req.query[key]) return res.ApiResponse.error(500, "Invalid search query");
                 switch(key) {
@@ -112,12 +129,18 @@ export class ApplicationsController {
                         } else {
                             filter += ` AND (countyOfOrigin eq '${value}')`;
                         }
+                        if(categoryFilterQuery) {
+                            filter += ` AND (${categoryFilterQuery})`;
+                        }
                         break;
                     case 'category':
                         if (!filter) {
                             filter = `(category eq '${value}')`;
                         } else {
                             filter += ` AND (category eq '${value}')`;
+                        }
+                        if(countiesFilterQuery) {
+                            filter += ` AND (${countiesFilterQuery})`;
                         }
                         break;
                     default:
@@ -160,4 +183,5 @@ export class ApplicationsController {
             return res.ApiResponse.error(500, error.message);
         }
     }
+    
 }
