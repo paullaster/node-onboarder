@@ -16,7 +16,7 @@ class NTLMSERVICE {
         this.odata_url = `${odata_url}/${this.entity}`
         this.request = this.request.bind(this);
     }
-    async request(payload = {}, method = 'GET', params = {}) {
+    async request(payload = {}, method = 'GET', params = {}, headers = {}) {
         try {
             const requestMethod = method.toUpperCase();
             if (this.odata) {
@@ -27,6 +27,7 @@ class NTLMSERVICE {
                 method: requestMethod,
                 headers: {
                     'Content-Type': 'application/json',
+                    ...headers
                 },
             };
             if (Object.keys(params).length) {
@@ -34,6 +35,7 @@ class NTLMSERVICE {
             }
             switch (requestMethod) {
                 case 'GET':
+                    requestOptions.headers['Data-Access-Intent'] = "ReadOnly";
                     break;
                 case 'DELETE':
                     requestOptions.headers['If-Match'] = "*"; 

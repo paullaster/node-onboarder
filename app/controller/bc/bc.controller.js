@@ -7,6 +7,7 @@ export class BCController {
         this.getConsoltium = this.getConsoltium.bind(this);
         this.leaveFeedback = this.leaveFeedback.bind(this);
         this.getFeedbackHistory = this.getFeedbackHistory.bind(this);
+        this.navigateToNext = this.navigateToNext.bind(this);
     }
 
     async postapplicant(applicant) {
@@ -38,13 +39,16 @@ export class BCController {
                 "$expand": "*",
                 $count: true,
             };
+            const headers = {
+                "Prefer": "return=representation, odata.maxpagesize=20",
+            };
             for (const it of args) {
                 query = {
                     ...query,
                     ...it,
                 }
             }
-            const { success, data, error } = await this.traport.request({}, 'GET', query);
+            const { success, data, error } = await this.traport.request({}, 'GET', query, headers);
             if (success) {
                 return { success, data };
             }
@@ -112,6 +116,17 @@ export class BCController {
             return { success, error };
         } catch (error) {
             return {success: false, error: error.message};
+        }
+    }
+    async navigateToNext() {
+        try {
+            const { success, data, error } = await this.traport.request({}, 'GET');
+            if (success) {
+                return { success, data };
+            }
+            return { success, error };
+        } catch (error) {
+            return { success: false, error: error.message};
         }
     }
 }

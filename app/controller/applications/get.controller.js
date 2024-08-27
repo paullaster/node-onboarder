@@ -93,27 +93,49 @@ export class ApplicationsController {
         try {
             if (!req.query) return res.ApiResponse.error(500, "Invalid search query");
             let filter;
+            const paginator = {};
+            console.log("uncleaned ", req.query)
+            for (const [key, value] of Object.entries(req.query)) {
+                if (key.startsWith('$')) {
+                    paginator[key] = value;
+                    delete req.query[key];
+                }
+            }
+            console.log('paginator', paginator);
+            console.log('Cleaned query', req.query);
             for (const [key, value] of Object.entries(req.query)) {
                 if (!req.query[key]) return res.ApiResponse.error(500, "Invalid search query");
-                if (key === 'county') {
-                    if (!filter) {
-                        filter = `(countyOfOrigin eq '${value}')`;
-                    } else {
-                        filter += ` AND (countyOfOrigin eq '${value}')`;
-                    }
+                switch(key) {
+                    case 'county':
+                        if (!filter) {
+                            filter = `(countyOfOrigin eq '${value}')`;
+                        } else {
+                            filter += ` AND (countyOfOrigin eq '${value}')`;
+                        }
+                        break;
+                    case 'category':
+                        if (!filter) {
+                            filter = `(category eq '${value}')`;
+                        } else {
+                            filter += ` AND (category eq '${value}')`;
+                        }
+                        break;
+                    default:
+                        if (!filter) {
+                            filter = `(${key} eq '${value}')`;
+                        } else {
+                            filter += ` AND (${key} eq '${value}')`;
+                        }
+                        break;
+
+
                 }
-                if (key === 'category') {
-                    if (!filter) {
-                        filter = `(category eq '${value}')`;
-                    } else {
-                        filter += ` AND (category eq '${value}')`;
-                    }
-                }
+                
             }
             const transport = new NTLMSERVICE('applications');
             const bcInstance = new BCController(transport);
             console.log("FILTER QUERY: ", filter)
-            const { success, data: applications, error } = await bcInstance.getApplications(filter);
+            const { success, data: applications, error } = await bcInstance.getApplications(filter, paginator);
             if (success) {
                 return res.ApiResponse.success(applications);
             } else {
@@ -121,6 +143,21 @@ export class ApplicationsController {
             }
         } catch (error) {
             return res.ApiResponse.error(500, error);
+        }
+    }
+    async navigateToNext(req, res) {
+        try {
+            if (!req.query) return res.ApiResponse.error(500, "Invalid next page token");
+            const transport = new NTLMSERVICE(`applications?${req.query}`);
+            const bcInstance = new BCController(transport);
+            const { success, data: applications, error } = await bcInstance.navigateToNext();
+            if (success) {
+                return res.ApiResponse.success(applications);
+            } else {
+                return res.ApiResponse.error(404, error);
+            }
+        } catch (error) {
+            return res.ApiResponse.error(500, error.message);
         }
     }
 }
