@@ -68,7 +68,7 @@ export class UserController {
                 email: user.eMail,
                 name: user.name,
                 phone: user.phone,
-                role: user.lead ? 'lead' :  user.type === 'HR' ? 'hr' : 'user',
+                role: user.lead ? 'lead' :  user.type === 'HR' ? 'hr' : user.type === 'Admin' ? 'admin' : 'user',
                 consoltium: user.no,
                 active: false,
                 belongsTo: user.belongsTo ?? null,

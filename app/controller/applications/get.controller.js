@@ -29,32 +29,50 @@ export class ApplicationsController {
                 }
             })
             let filter = '';
-            if (countyFilterQuery && req.user.role.toLowerCase() !== 'hr') {
+            if (countyFilterQuery && (req.user.role.toLowerCase() !== 'hr' || countyFilterQuery && req.user.role.toLowerCase() !== 'admin')) {
                 filter += `(${countyFilterQuery})`;
             }
-            if (categoryFilterQuery && req.user.role.toLowerCase() === 'hr' && !req.query.approved && !req.query.onboarding && !req.query.hrReviewed) {
+            if (
+                categoryFilterQuery && 
+                (
+                    req.user.role.toLowerCase() === 'hr' ||
+                    req.user.role.toLowerCase() === 'admin'
+                ) && 
+                !req.query.approved && !req.query.onboarding && !req.query.hrReviewed) {
                 filter = `(status eq 'New')`;
             }
-            if (categoryFilterQuery && req.user.role.toLowerCase() !== 'hr') {
+            if (categoryFilterQuery && (req.user.role.toLowerCase() !== 'hr' || req.user.role.toLowerCase() !== 'admin')) {
                 filter += filter ? ` AND (${categoryFilterQuery}) AND (status eq 'New')` : `(${categoryFilterQuery}) AND (status eq 'New')`;
             }
-            if (req.query.onboarding && req.user.role.toLowerCase() === 'hr') {
-                filter = categoryFilterQuery ? ` (${categoryFilterQuery}) AND (status eq 'Onboarded')` : ` (status eq 'Onboarded')`;
+            if (req.query.onboarding) {
+                if (req.user.role.toLowerCase() === 'hr') {
+                    filter = categoryFilterQuery ? ` (${categoryFilterQuery}) AND (status eq 'Onboarded')` : ` (status eq 'Onboarded')`;
+                }else if (req.user.role.toLowerCase() === 'admin') {
+                    filter = `(status eq 'Onboarded')`;
+                }else {
+                    filter = `(onboardingConsortia eq '${req.user.belongsTo}') AND (status eq 'Onboarded')`;
+                }
             }
-            if (req.query.onboarding && req.user.role.toLowerCase() !== 'hr') {
-                filter = `(onboardingConsortia eq '${req.user.belongsTo}') AND (status eq 'Onboarded')`;
+            if (req.query.approved) {
+                if (req.user.role.toLowerCase() == 'admin') {
+                    filter = `(status eq 'Approved')`;
+                }else if (req.user.role.toLowerCase() === 'hr'){
+                    filter = categoryFilterQuery ? `(${categoryFilterQuery}) AND (status eq 'Approved')` : ` (status eq 'Approved')`;
+                }else {
+                    filter = `(onboardingConsortia eq '${req.user.belongsTo}') AND (status eq 'Approved')`
+                }
             }
-            if (req.query.approved && req.user.role.toLowerCase() === 'hr') {
-                filter = categoryFilterQuery ? `(${categoryFilterQuery}) AND (status eq 'Approved')` : ` (status eq 'Approved')`;
-            }
-            if (req.query.approved && req.user.role.toLowerCase() !== 'hr') {
-                filter = `(onboardingConsortia eq '${req.user.belongsTo}') AND (status eq 'Approved')`
-            }
-            if (req.query.hrReviewed && req.user.role.toLowerCase() === 'hr') {
-                filter = categoryFilterQuery ? ` (${categoryFilterQuery} )AND (status eq 'Reviewed') AND (hRReviewedBy eq '${req.user.consoltium}')` : `(status eq 'Reviewed') AND (hRReviewedBy eq '${req.user.consoltium}')`
-            }
-            if (req.query.hrReviewed && req.user.role.toLowerCase() !== 'hr') {
-                filter = ` (approvedByConsortia eq '${req.user.belongsTo}')  AND (status eq 'Reviewed')`;
+            if (req.query.hrReviewed ) {
+                if (req.user.role.toLowerCase() === 'hr') {
+                    filter = categoryFilterQuery ? ` (${categoryFilterQuery} )AND (status eq 'Reviewed') AND (hRReviewedBy eq '${req.user.consoltium}')` : `(status eq 'Reviewed') AND (hRReviewedBy eq '${req.user.consoltium}')`
+                }else if (req.user.role.toLowerCase() === 'admin') {
+                    filter = `(status eq 'Reviewed')`
+
+                }else {
+                    filter = ` (approvedByConsortia eq '${req.user.belongsTo}')  AND (status eq 'Reviewed')`;
+                }
+                
+                
             }
             console.log(filter);
             const transport = new NTLMSERVICE('applications');
