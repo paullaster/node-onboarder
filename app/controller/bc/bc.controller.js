@@ -109,6 +109,7 @@ export class BCController {
     }
     async getFeedbackHistory(query) {
         try {
+            query['$expand'] = "*";
             const { success, data, error } = await this.traport.request({}, 'GET', query);
             if (success) {
                 return { success, data };
