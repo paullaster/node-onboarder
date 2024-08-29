@@ -75,6 +75,7 @@ export class UserController {
                 title: user.title ?? null,
                 categoriesFilter: user.type.toLowerCase() === 'hr' ? user.consortiaFilter : user.categoriesFilter,
                 countiesFilter: user.countiesFilter,
+                isAdmin: user.type === 'Admin',
                 // consortiaFilter: user.consortiaFilter,
             };
             const createdUser = await User.create(newUser);

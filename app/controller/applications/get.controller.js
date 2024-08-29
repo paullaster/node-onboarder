@@ -41,7 +41,7 @@ export class ApplicationsController {
                 !req.query.approved && !req.query.onboarding && !req.query.hrReviewed) {
                 filter = `(status eq 'New')`;
             }
-            if (categoryFilterQuery && (req.user.role.toLowerCase() !== 'hr' || req.user.role.toLowerCase() !== 'admin')) {
+            if (categoryFilterQuery && req.user.role.toLowerCase() !== 'hr' && req.user.role.toLowerCase() !== 'admin') {
                 filter += filter ? ` AND (${categoryFilterQuery}) AND (status eq 'New')` : `(${categoryFilterQuery}) AND (status eq 'New')`;
             }
             if (req.query.onboarding) {
@@ -185,24 +185,19 @@ export class ApplicationsController {
                                 }
                                 break;
                             case 'Onboarded':
-                                if (!filter) {
-                                    if (
-                                        req.user.role.toLowerCase() === 'hr' ||
-                                        req.user.role.toLowerCase() === 'admin'
-                                    ) {
-                                        filter = `(status eq 'Onboarded')`;
-                                    }else {
-                                        filter = `(status eq 'Onboarded') AND (onboardingConsortia eq '${req.user.belongsTo}')`;
-                                    }
-                                } else {
-                                    if (
-                                        req.user.role.toLowerCase() === 'hr' ||
-                                        req.user.role.toLowerCase() === 'admin'
-                                    ) {
-                                        filter += ` AND (status eq 'Onboarded')`;
-                                    } else {
-                                        filter += ` AND (status eq 'Onboarded') AND (onboardingConsortia eq '${req.user.belongsTo}')`;
-                                    }
+                                let tfilter;
+                                if (
+                                    req.user.role.toLowerCase() === 'hr' ||
+                                    req.user.role.toLowerCase() === 'admin'
+                                ) {
+                                    tfilter = `(status eq 'Onboarded')`;
+                                }else {
+                                    tfilter = `(status eq 'Onboarded') AND (onboardingConsortia eq '${req.user.belongsTo}')`;
+                                }
+                                if (filter) {
+                                    filter=filter + ' AND ' + tfilter;
+                                }  else {
+                                    filter=tfilter
                                 }
                                 break;
                             case 'Approved':
