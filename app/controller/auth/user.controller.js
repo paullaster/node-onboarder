@@ -6,9 +6,12 @@ import bcrypt from 'bcrypt';
 import { BCController } from '../bc/bc.controller.js';
 import NTLMSERVICE from '../../services/ntlm.service.js';
 import eventEmmitter from '../../events/emmitter/event.emitter.js';
+import { RandomCodeGenerator } from '../../../util/unique.codes.js';
 export class UserController {
     constructor() {
         this.login = this.login.bind(this);
+        this.hasPassword = this.hasPassword.bind(this);
+        this.register = this.register.bind(this);
     }
     async login(req, res) {
         try {
@@ -49,6 +52,42 @@ export class UserController {
         } catch (error) {
             
         }
+    }
+    async register (req, res) {
+        try {
+            if (!req.body) {
+                return res.ApiResponse.error(500, "Missing payload");
+            }
+            const institutionCode = RandomCodeGenerator(3, 'INS');
+            const hashedPassword = await this.hasPassword(req.body.password);
+            const institution = {
+                email: req.body.email,
+                name: `${req.body.firstName} ${req.body.lastName}`,
+                role: req.body.type,
+                password: hashedPassword,
+                active:false,
+                phone:req.body.phone,
+                consoltium: institutionCode,
+                belongsTo: institutionCode,
+                title: 'INSTITUTION ADMIN',
+                emailed:false,
+                categoriesFilter: '',
+                countiesFilter:'',
+            };
+            // const user = await User.create(institution);
+            // if (!user) {
+            //     return res.ApiResponse.error(500, "Failed to create user, please try again later!");
+            // }
+            return res.ApiResponse.success({  }, 200, "Account successfully created.");
+        } catch (error) {
+            return res.ApiResponse.error(500, "We were not able to complete your account registration, please try again later!", error.message);
+        }
+    }
+    async sendOTP(req, res) {
+        return res.ApiResponse.success({  }, 200, "Registration successful.");
+    }
+    async verifyOTP (req, res) {
+        return res.ApiResponse.success({  }, 200, "Verification successful.");
     }
     async activateAccount(req, res) {
         try {
@@ -144,6 +183,15 @@ export class UserController {
             res.ApiResponse.success(user, "Consoltium added successfully", 201);
         } catch (error) {
             return res.ApiResponse.error(500, error.message);
+        }
+    }
+    async hasPassword(rawPassword) {
+        try {
+            const saltRounds = 10;
+            const salt = await bcrypt.genSalt(saltRounds);
+            return await bcrypt.hash(rawPassword, salt);
+        } catch (error) {
+            return Promise.reject(new Error(error.message));
         }
     }
 }
