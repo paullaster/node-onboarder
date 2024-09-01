@@ -7,6 +7,7 @@ import { BCController } from '../bc/bc.controller.js';
 import NTLMSERVICE from '../../services/ntlm.service.js';
 import eventEmmitter from '../../events/emmitter/event.emitter.js';
 import { RandomCodeGenerator } from '../../../util/unique.codes.js';
+import OTP from '../../model/one.time.password.js';
 export class UserController {
     constructor() {
         this.login = this.login.bind(this);
@@ -74,17 +75,37 @@ export class UserController {
                 categoriesFilter: '',
                 countiesFilter:'',
             };
-            // const user = await User.create(institution);
-            // if (!user) {
-            //     return res.ApiResponse.error(500, "Failed to create user, please try again later!");
-            // }
+            const user = await User.create(institution);
+            if (!user) {
+                return res.ApiResponse.error(500, "Failed to create user, please try again later!");
+            }
             return res.ApiResponse.success({  }, 200, "Account successfully created.");
         } catch (error) {
             return res.ApiResponse.error(500, "We were not able to complete your account registration, please try again later!", error.message);
         }
     }
     async sendOTP(req, res) {
-        return res.ApiResponse.success({  }, 200, "Registration successful.");
+        try {
+            if (!req.body) return res.ApiResponse.error(500, "Missing payload");
+            if (!req.body.email) return res.ApiResponse.error(500, "Missing email");
+            const user = await User.findOne({ where: {email: req.body.email}});
+            if (!user) return res.ApiResponse.error(500, "We don't have this user, please try to register again");
+            if (user['dataValues'].active) return res.ApiResponse.error(500,  "You already an account, please login instead");
+            const otp = RandomCodeGenerator(4, 'IN');
+            const userOTP = await OTP.create(
+                {
+                    passcode: otp,
+                    expiry: new Date(Date.now() + 600000), // 10 minutes
+                    userId: user.id
+                }
+            );
+            eventEmmitter.emit('send-account-otp', {email: req.body.email, userOTP});
+            setTimeout(()=> {
+                return res.ApiResponse.success({  }, 200, "We sent one time password to your email and phone number");
+            }, 5000)
+        } catch (error) {
+            return res.ApiResponse.error(500, "We were not able to complete this action, please try again later!", error.message);
+        }
     }
     async verifyOTP (req, res) {
         return res.ApiResponse.success({  }, 200, "Verification successful.");

@@ -20,7 +20,7 @@ export class Notification {
                         if (success) {
                             return Promise.resolve({success, data});
                         }else{
-                            return Promise.reject({success, error});
+                            return Promise.reject(new Error(error));
                         }
                     });
                 case 'viaSms':
