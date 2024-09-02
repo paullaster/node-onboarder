@@ -12,6 +12,11 @@ const OTP = sequelize.define('OneTimePassword',{
         type: DataTypes.DATE,
         allowNull: false,
         unique: false
+    },
+    used: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        unique: false,
     }
 },
 {

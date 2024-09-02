@@ -8,6 +8,7 @@ import NTLMSERVICE from '../../services/ntlm.service.js';
 import eventEmmitter from '../../events/emmitter/event.emitter.js';
 import { RandomCodeGenerator } from '../../../util/unique.codes.js';
 import OTP from '../../model/one.time.password.js';
+import { Op } from 'sequelize';
 export class UserController {
     constructor() {
         this.login = this.login.bind(this);
@@ -108,7 +109,20 @@ export class UserController {
         }
     }
     async verifyOTP (req, res) {
-        return res.ApiResponse.success({  }, 200, "Verification successful.");
+        try {
+            if (!req.body) return res.ApiResponse.error(500, "Missing payload");
+            if (!req.body.email) return res.ApiResponse.error(500, "Missing email");
+            if (!req.body.otp) return res.ApiResponse.error(500, "Missing otp");
+            const userOTP = await OTP.findOne({ where: {passcode: req.body.otp, expiry: {[Op.gte]: new Date()}}});
+            if (!userOTP) return res.ApiResponse.error(401, "Invalid OTP");
+            const user = await User.findByPk(userOTP['dataValues'].userId);
+            if (!user) return res.ApiResponse.error(401, "Invalid user");
+            await user.update({ active: true });
+            await userOTP.destroy();
+            return res.ApiResponse.success({  }, 200, "Verification successful.");
+        } catch (error) {
+            return res.ApiResponse.error(500, "We were not able to complete this action, please try again later!", error.message);
+        }
     }
     async activateAccount(req, res) {
         try {
