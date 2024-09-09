@@ -8,6 +8,7 @@ export class BCController {
         this.leaveFeedback = this.leaveFeedback.bind(this);
         this.getFeedbackHistory = this.getFeedbackHistory.bind(this);
         this.navigateToNext = this.navigateToNext.bind(this);
+        this.bcRequest = this.bcRequest.bind(this);
     }
 
     async postapplicant(applicant) {
@@ -129,5 +130,26 @@ export class BCController {
         } catch (error) {
             return { success: false, error: error.message};
         }
+    }
+    async bcRequest(methodType = 'get', body = {}, params = {}, headers = {}) {
+        try {
+            const method = methodType.toLowerCase();
+            switch (method) {
+                case 'get':
+                    return await this.traport.request({}, 'GET', params, headers);
+                case 'post':
+                    return await this.traport.request(body, 'POST', params, headers);
+                case 'put':
+                    return await this.traport.request(body, 'PUT', params, headers);
+                case 'patch':
+                    return await this.traport.request(body, 'PATCH', params, headers);
+                case 'delete':
+                    return await this.traport.request({}, 'DELETE', params, headers);
+                default:
+                    throw new Error('Invalid HTTP method');          
+            }
+        } catch (error) {
+            return { success: false, error: error.message};
+        }     
     }
 }

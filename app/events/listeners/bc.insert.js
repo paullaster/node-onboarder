@@ -173,3 +173,24 @@ eventEmmitter.on('unsync', async() => {
         console.error(`Unsync:  ${error}`);
     }
 })
+
+eventEmmitter.on('save-bc-user', async (payload)=>{
+    try {
+        const ntlmService = new NTLMSERVICE('biodata');
+        const BCINSTANCE = new BCController(ntlmService);
+        const data = {
+            firstName: payload['name'],
+            eMail: payload['email'],
+            phone: payload['phone'],
+            idNumber: payload['consoltium'],
+        };
+        const { success, error } = await BCINSTANCE.postBCUser(username, password);
+        if (success) {
+            console.log('BC User saved successfully');
+        } else {
+            console.error(`Error in BC User Save: ${error}`);
+        }
+    } catch (error) {
+        console.error(`save-bc-user:  ${error}`);
+    }
+})

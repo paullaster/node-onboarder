@@ -14,6 +14,8 @@ export class UserController {
         this.login = this.login.bind(this);
         this.hasPassword = this.hasPassword.bind(this);
         this.register = this.register.bind(this);
+        this.saveBCProfile = this.saveBCProfile.bind(this);
+        this.verifyOTP = this.verifyOTP.bind(this);
     }
     async login(req, res) {
         try {
@@ -21,10 +23,10 @@ export class UserController {
                 return res.ApiResponse.error(500, "Missing payload");
             }
             const { email, password } = req.body;
-            if (!email || !password)  {
+            if (!email || !password) {
                 return res.ApiResponse.error(500, "Missing email or password");
             }
-            const user = await User.findOne({ where: {email: email}});
+            const user = await User.findOne({ where: { email: email } });
             if (!user) {
                 return res.ApiResponse.error(404, "User not found");
             };
@@ -37,50 +39,50 @@ export class UserController {
                 return res.ApiResponse.error(401, 'Invalid password');
             }
             const token = jwt.sign(
-                { 
+                {
                     id: user['dataValues'].id,
-                    email: user['dataValues'].email, 
-                     name: user['dataValues'].name, 
-                     role: user['dataValues'].role,
-                     title: user['dataValues'].title,
-                     categoriesFilter: user['dataValues'].categoriesFilter,
-                     countiesFilter: user['dataValues'].countiesFilter,
-                     consortiaFilter: user['dataValues'].categoriesFilter,
-                     isAdmin: user['dataValues'].isAdmin,
-                     consoltium: user['dataValues'].consoltium,
-                     belongsTo: user['dataValues'].belongsTo
+                    email: user['dataValues'].email,
+                    name: user['dataValues'].name,
+                    role: user['dataValues'].role,
+                    title: user['dataValues'].title,
+                    categoriesFilter: user['dataValues'].categoriesFilter,
+                    countiesFilter: user['dataValues'].countiesFilter,
+                    consortiaFilter: user['dataValues'].categoriesFilter,
+                    isAdmin: user['dataValues'].isAdmin,
+                    consoltium: user['dataValues'].consoltium,
+                    belongsTo: user['dataValues'].belongsTo
                 }, app.key, { algorithm: 'HS512', expiresIn: '10h' });
             return res.ApiResponse.success(token, 200, "Login successful");
         } catch (error) {
-            
+
         }
     }
-    async register (req, res) {
+    async register(req, res) {
         try {
             if (!req.body) {
                 return res.ApiResponse.error(500, "Missing payload");
             }
-            const institutionCode = RandomCodeGenerator(3, 'INS');
+            const institutionCode = RandomCodeGenerator(5, 'I');
             const hashedPassword = await this.hasPassword(req.body.password);
             const institution = {
                 email: req.body.email,
-                name: `${req.body.firstName} ${req.body.lastName}`,
+                name: `${req.body.institutionName}`,
                 role: req.body.type,
                 password: hashedPassword,
-                active:false,
-                phone:req.body.phone,
+                active: false,
+                phone: req.body.phone,
                 consoltium: institutionCode,
                 belongsTo: institutionCode,
                 title: 'INSTITUTION ADMIN',
-                emailed:false,
+                emailed: false,
                 categoriesFilter: '',
-                countiesFilter:'',
+                countiesFilter: '',
             };
             const user = await User.create(institution);
             if (!user) {
                 return res.ApiResponse.error(500, "Failed to create user, please try again later!");
             }
-            return res.ApiResponse.success({  }, 200, "Account successfully created.");
+            return res.ApiResponse.success({}, 200, "Account successfully created.");
         } catch (error) {
             return res.ApiResponse.error(500, "We were not able to complete your account registration, please try again later!", error.message);
         }
@@ -89,10 +91,10 @@ export class UserController {
         try {
             if (!req.body) return res.ApiResponse.error(500, "Missing payload");
             if (!req.body.email) return res.ApiResponse.error(500, "Missing email");
-            const user = await User.findOne({ where: {email: req.body.email}});
+            const user = await User.findOne({ where: { email: req.body.email } });
             if (!user) return res.ApiResponse.error(500, "We don't have this user, please try to register again");
-            if (user['dataValues'].active) return res.ApiResponse.error(500,  "You already an account, please login instead");
-            const otp = RandomCodeGenerator(4, 'IN');
+            if (user['dataValues'].active) return res.ApiResponse.error(500, "You already an account, please login instead");
+            const otp = RandomCodeGenerator(5, 'I');
             const userOTP = await OTP.create(
                 {
                     passcode: otp,
@@ -100,26 +102,33 @@ export class UserController {
                     userId: user.id
                 }
             );
-            eventEmmitter.emit('send-account-otp', {email: req.body.email, userOTP});
-            setTimeout(()=> {
-                return res.ApiResponse.success({  }, 200, "We sent one time password to your email and phone number");
+            eventEmmitter.emit('send-account-otp', { email: req.body.email, userOTP });
+            setTimeout(() => {
+                return res.ApiResponse.success({}, 200, "We sent one time password to your email and phone number");
             }, 5000)
         } catch (error) {
             return res.ApiResponse.error(500, "We were not able to complete this action, please try again later!", error.message);
         }
     }
-    async verifyOTP (req, res) {
+    async verifyOTP(req, res) {
         try {
             if (!req.body) return res.ApiResponse.error(500, "Missing payload");
             if (!req.body.email) return res.ApiResponse.error(500, "Missing email");
             if (!req.body.otp) return res.ApiResponse.error(500, "Missing otp");
-            const userOTP = await OTP.findOne({ where: {passcode: req.body.otp, expiry: {[Op.gte]: new Date()}}});
+            const userOTP = await OTP.findOne({ where: { passcode: req.body.otp, expiry: { [Op.gte]: new Date() } } });
             if (!userOTP) return res.ApiResponse.error(401, "Invalid OTP");
             const user = await User.findByPk(userOTP['dataValues'].userId);
             if (!user) return res.ApiResponse.error(401, "Invalid user");
-            await user.update({ active: true });
+            const { success, data, error} = await this.saveBCProfile(user['dataValues']);
+            if (!success) return res.ApiResponse.error(500, error);
+
+            await user.update({ 
+                active: true,
+                consoltium: data.no,
+                belongsTo: data.no
+              });
             await userOTP.destroy();
-            return res.ApiResponse.success({  }, 200, "Verification successful.");
+            return res.ApiResponse.success({}, 200, "Verification successful.");
         } catch (error) {
             return res.ApiResponse.error(500, "We were not able to complete this action, please try again later!", error.message);
         }
@@ -128,11 +137,11 @@ export class UserController {
         try {
             if (!req.body) return res.ApiResponse.error(500, "Missing payload");
             if (!req.body.email) return res.ApiResponse.error(500, "Missing email");
-            const existInPortal = await User.findOne({where: {email: req.body.email}});
+            const existInPortal = await User.findOne({ where: { email: req.body.email } });
             if (existInPortal) return res.ApiResponse.error(409, "Email already exists in the portal, Please login or reset your password!");
             const transport = new NTLMSERVICE('consortia');
-            const bcInstance =  new BCController(transport);
-            const {data:consoltium, success, error} = await bcInstance.getConsoltium({eMail: req.body.email});
+            const bcInstance = new BCController(transport);
+            const { data: consoltium, success, error } = await bcInstance.getConsoltium({ eMail: req.body.email });
             if (!success) return res.ApiResponse.error(407, error);
             if (!consoltium?.value) {
                 return res.ApiResponse.error(409, "We can't find this email!");
@@ -142,7 +151,7 @@ export class UserController {
                 email: user.eMail,
                 name: user.name,
                 phone: user.phone,
-                role: user.type === 'Admin' ? 'admin' : user.type === 'HR' ? 'hr': user.lead ? 'lead' : 'user',
+                role: user.type === 'Admin' ? 'admin' : user.type === 'HR' ? 'hr' : user.lead ? 'lead' : 'user',
                 consoltium: user.no,
                 active: false,
                 belongsTo: user.belongsTo ?? null,
@@ -163,8 +172,8 @@ export class UserController {
             };
             const userToken = await Token.create(data);
             const resetLink = `${app.web_url}/auth/set-password/${userToken.key}`;
-            eventEmmitter.emit('activate-account', {email, name, resetLink, type: user.type});
-            return res.ApiResponse.success({  }, 200, "Account activation link has been sent to your email.");
+            eventEmmitter.emit('activate-account', { email, name, resetLink, type: user.type });
+            return res.ApiResponse.success({}, 200, "Account activation link has been sent to your email.");
         } catch (error) {
             return res.ApiResponse.error(500, "Error while activating you account:  " + error.message);
         }
@@ -173,7 +182,7 @@ export class UserController {
         try {
             if (!req.body) return res.ApiResponse.error(500, "Missing payload");
             if (!req.body.email) return res.ApiResponse.error(500, "Missing email");
-            const user = await User.findOne({where: {email: req.body.email}});
+            const user = await User.findOne({ where: { email: req.body.email } });
             if (!user) return res.ApiResponse.error(404, "User not found");
             const token = jwt.sign({ email: user.email }, app.key, { algorithm: 'HS512', expiresIn: '1h' });
             const data = {
@@ -183,31 +192,31 @@ export class UserController {
             };
             const userToken = await Token.create(data);
             const resetLink = `${app.web_url}/auth/set-password/${userToken.key}`;
-            eventEmmitter.emit('forgot-password', {email: user['dataValues'].email, resetLink});
-            return res.ApiResponse.success({  }, 200, "Reset password link has been sent to your email.");
+            eventEmmitter.emit('forgot-password', { email: user['dataValues'].email, resetLink });
+            return res.ApiResponse.success({}, 200, "Reset password link has been sent to your email.");
         } catch (error) {
             return res.ApiResponse.error(500, "Error while sending forgot password email:  " + error.message);
         }
     }
-    async setPassword(req, res) { 
+    async setPassword(req, res) {
         try {
             if (!req.body) return res.ApiResponse.error(500, "Invalid body");
-            const token = jwt.verify(req.body.token, app.key, {algorithms: 'HS512'});
+            const token = jwt.verify(req.body.token, app.key, { algorithms: 'HS512' });
             if (!token.email) return res.ApiResponse.error(401, "Invalid token");
-            const user = await User.findOne({where: {email: token.email}});
+            const user = await User.findOne({ where: { email: token.email } });
             if (!user) return res.ApiResponse.error(404, "User not found");
             const saltRounds = 10;
             const salt = await bcrypt.genSalt(saltRounds);
             user.password = await bcrypt.hash(req.body.password, salt);
             user.active = true;
-            const usedToken = await Token.findOne({ where: { userId: user['dataValues'].id}});
+            const usedToken = await Token.findOne({ where: { userId: user['dataValues'].id } });
             if (usedToken) await usedToken.destroy();
             await user.save();
             return res.ApiResponse.success({}, 200, "User password was set successfully");
         } catch (error) {
             return res.ApiResponse.error(500, "Error while creating user password:  " + error.message);
         }
-     }
+    }
     async addConsotium(req, res) {
         try {
             if (!req.body) return res.ApiResponse.error(500, "Missing payload");
@@ -228,5 +237,17 @@ export class UserController {
         } catch (error) {
             return Promise.reject(new Error(error.message));
         }
+    }
+    async saveBCProfile(payload) {
+        const ntlmService = new NTLMSERVICE('biodata');
+        const BCINSTANCE = new BCController(ntlmService);
+        const bcPayload = {
+            firstName: payload['name'],
+            eMail: payload['email'],
+            phone: payload['phone'],
+            idNumber: payload['consoltium'],
+            category: 'OTHER',
+        };
+        return await BCINSTANCE.postapplicant(bcPayload);
     }
 }
