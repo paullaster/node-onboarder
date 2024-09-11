@@ -4,6 +4,7 @@ import { BCController } from "../app/controller/bc/bc.controller.js";
 import NTLMSERVICE from "../app/services/ntlm.service.js";
 import { ContactPerson } from "../app/controller/hostelRequest/contact.person.controller.js";
 import { StudentData } from "../app/controller/hostelRequest/student.data.controller.js";
+import { AccommodationInformation } from "../app/controller/hostelRequest/accommodation.information.controller.js";
 
 
 
@@ -20,6 +21,17 @@ hostelRequestroute.patch('/contact', new ContactPerson(new BCController(new NTLM
 
 // STUDENT
 hostelRequestroute.post('/student', new StudentData(new BCController(new NTLMSERVICE('studentData'))).createStudentData);
+hostelRequestroute.get('/student', new StudentData(new BCController(new NTLMSERVICE('studentData'))).getStudentData);
 hostelRequestroute.patch('/student', new StudentData(new BCController(new NTLMSERVICE('studentData'))).updateStudentData);
+
+
+// ACCOMMODATION
+hostelRequestroute.post('/accommodation', new AccommodationInformation(new BCController(new NTLMSERVICE('accomodationUnits'))).createAccommodationInformation);
+hostelRequestroute.get('/accommodation', new AccommodationInformation(new BCController(new NTLMSERVICE('accomodationUnits'))).getAccommodationInformation);
+hostelRequestroute.patch('/accommodation', new AccommodationInformation(new BCController(new NTLMSERVICE('accomodationUnits'))).updateAccommodationInformation);
+hostelRequestroute.delete('/accommodation', new AccommodationInformation(new BCController(new NTLMSERVICE('accomodationUnits'))).createAccommodationInformation);
+
+
+
 
 export default hostelRequestroute;

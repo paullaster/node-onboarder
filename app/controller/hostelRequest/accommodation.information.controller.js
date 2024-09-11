@@ -1,12 +1,12 @@
-export class StudentData {
+export class AccommodationInformation {
     constructor(BCInterface) {
         this.BCInterface = BCInterface;
         // this.deleteHostelRequest = this.deleteHostelRequest.bind(this);
-        this.createStudentData = this.createStudentData.bind(this);
-        this.updateStudentData = this.updateStudentData.bind(this);
-        this.getStudentData = this.getStudentData.bind(this);
+        this.createAccommodationInformation = this.createAccommodationInformation.bind(this);
+        this.updateAccommodationInformation = this.updateAccommodationInformation.bind(this);
+        this.getAccommodationInformation = this.getAccommodationInformation.bind(this);
     }
-    async getStudentData(req, res) {
+    async getAccommodationInformation(req, res) {
         try {
             const headers = {
                 "Content-Type": "application/json",
@@ -22,7 +22,7 @@ export class StudentData {
             return res.ApiResponse.error(500, "We encouterred an error:  " + error.message);
         }
     }
-    async createStudentData(req, res) {
+    async createAccommodationInformation(req, res) {
         try {
             if (!req.body) {
                 return res.ApiResponse.error(500, "Invalid payload");
@@ -41,7 +41,7 @@ export class StudentData {
             return res.ApiResponse.error(500, "We encouterred an error:  " + error.message);
         }
     }
-    async updateStudentData(req, res) {
+    async updateAccommodationInformation(req, res) {
         try {
             if (!req.body) {
                 return res.ApiResponse.error(500, "Invalid payload");
