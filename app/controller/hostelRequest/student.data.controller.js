@@ -1,38 +1,15 @@
-export class HostelRequest {
+export class StudentData {
     constructor(BCInterface) {
         this.BCInterface = BCInterface;
-        this.createHostelRequest = this.createHostelRequest.bind(this);
-        this.updateHostelRequest = this.updateHostelRequest.bind(this);
         // this.deleteHostelRequest = this.deleteHostelRequest.bind(this);
-        this.getHostelRequests = this.getHostelRequests.bind(this);
-        // this.getSingleHostelRequest = this.getSingleHostelRequest.bind(this);
+        this.createStudentData = this.createStudentData.bind(this);
+        this.updateStudentData = this.updateStudentData.bind(this);
     }
-    async getHostelRequests(req, res) {
-        try {
-            const filter = {
-                '$filter': `profileID eq '${req.user.consoltium}'`,
-                '$expand': "*",
-            };
-            const headers = {
-                "Prefer": "odata.maxpagesize=20",
-                'Data-Access-Intent': 'ReadOnly',
-            };
-            const { success, data, error } = await this.BCInterface.bcRequest('get', {}, filter, headers);
-            if (success) {
-                return res.ApiResponse.success(data, 200, "Reset password link has been sent to your email.");;
-            } else {
-                return res.ApiResponse.error(500, "We encouterred an error:  " + error);
-            }
-        } catch (error) {
-            return res.ApiResponse.error(500, "We encouterred an error:  " + error.message);
-        }
-    }
-    async createHostelRequest(req, res) {
+    async createStudentData(req, res) {
         try {
             if (!req.body) {
                 return res.ApiResponse.error(500, "Invalid payload");
             }
-            req.body['profileID'] = req.user.consoltium;
             const headers = {
                 "Content-Type": "application/json",
                 'Data-Access-Intent': 'ReadWrite',
@@ -47,7 +24,7 @@ export class HostelRequest {
             return res.ApiResponse.error(500, "We encouterred an error:  " + error.message);
         }
     }
-    async updateHostelRequest (req, res) {
+    async updateStudentData(req, res) {
         try {
             if (!req.body) {
                 return res.ApiResponse.error(500, "Invalid payload");
